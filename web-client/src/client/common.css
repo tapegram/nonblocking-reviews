@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    min-width: 100vw;
+    min-height: 100vh;
+}
+
+.hidden {
+    display: none;
+}
+
+tr.htmx-swapping td {
+    opacity: 0;
+    transition: opacity 1s ease-out;
+}
+
+.htmx-indicator {
+    display: none;
+    transition-duration: 500ms;
+}
+.htmx-request .htmx-indicator {
+    display: inherit;
+    opacity: 1
+}
