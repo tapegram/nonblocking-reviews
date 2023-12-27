@@ -3,6 +3,7 @@ resolver = "2"
 
 members = [
           ##PLOP NEW PACKAGE HOOK##
+          "review-stream/review-stream-service",
           "main",
           "web-client",
           "web-htmx",
