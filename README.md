@@ -1,5 +1,7 @@
 # Nonblocking Reviews with ML
 
+Any ideas for a good app name or just general language we should be using?
+
 ## Installing/Running
 
 Setup our prepush hook (to protect main)
