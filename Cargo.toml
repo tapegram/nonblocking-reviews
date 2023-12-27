@@ -4,6 +4,7 @@ resolver = "2"
 members = [
           ##PLOP NEW PACKAGE HOOK##
           "review-stream/review-stream-service",
+          "libs/mongo-testcontainer",
           "main",
           "web-client",
           "web-htmx",
