@@ -21,6 +21,24 @@ cargo install cargo-watch
 cargo watch -x run
 ```
 
+## Testing webhooks
+
+Using smee client we can forward webhooks to localhost.
+
+To install globally
+`npm install -g smee-client`
+
+Then you can run the following
+
+```
+smee -u WEBHOOK_PROXY_URL -t http://localhost:3000/github-webhook
+```
+
+Where WEBHOOK_PROXY_URL is whatever we set in the app (which for now is a smee endpoint): https://smee.io/fMWUzysZfMg1hpki
+
+so 
+`smee -u https://smee.io/fMWUzysZfMg1hpki -t http://localhost:3000/github-webhook`
+
 ## Code generation
 
 We are experimenting with code generation tools (using plopjs). run `./generate.sh` to enter the code generation dialogue.
