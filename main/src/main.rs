@@ -18,6 +18,10 @@ mod github_webhook_adapter;
 
 #[tokio::main]
 async fn main() {
+    // Bootstrapping out logging/tracing infra
+    // https://docs.rs/tracing-subscriber/latest/tracing_subscriber/fmt/fn.init.html
+    tracing_subscriber::fmt::init();
+
     let _env = load_environment();
 
     // Create WebHtmxState
