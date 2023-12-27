@@ -1,8 +1,8 @@
 use rscx::{component, html, props, CollectFragment};
 
-use web_client::server::attrs::Attrs;
-use web_client::server::modal::modal_target;
-use web_client::server::popup_menu::{Menu, MenuLink, PopupMenu};
+
+
+use web_client::server::popup_menu::{Menu, PopupMenu};
 
 use crate::components::logo::Logo;
 use crate::routes;

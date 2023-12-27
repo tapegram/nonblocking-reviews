@@ -4,12 +4,12 @@ use axum::{
     BoxError, Router,
 };
 use axum_login::{tower_sessions::SessionManagerLayer, AuthManagerLayerBuilder};
-use chrono::prelude::*;
+
 use environment::load_environment;
-use std::{net::SocketAddr, sync::Arc};
+use std::{net::SocketAddr};
 use tower::ServiceBuilder;
 
-use tower_sessions::{cookie::time::Duration, mongodb::Client, Expiry, MemoryStore, MongoDBStore};
+use tower_sessions::{cookie::time::Duration, Expiry, MemoryStore};
 use web_htmx::{livereload, routes as web_routes, state::WebHtmxState};
 
 mod auth;
@@ -17,7 +17,7 @@ mod environment;
 
 #[tokio::main]
 async fn main() {
-    let env = load_environment();
+    let _env = load_environment();
 
     // Create WebHtmxState
     // This is how you can inject dependencies into the web-htmx crate

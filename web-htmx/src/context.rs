@@ -5,7 +5,7 @@ use axum::{
     middleware::Next,
     response::Response,
 };
-use axum_login::{tower_sessions::Session, AuthSession};
+use axum_login::{tower_sessions::Session};
 use std::{collections::HashMap, future::Future};
 
 use crate::state::WebHtmxState;
@@ -22,8 +22,8 @@ tokio::task_local! {
 }
 
 pub async fn provide_context_layer(
-    State(state): State<WebHtmxState>,
-    session: Session,
+    State(_state): State<WebHtmxState>,
+    _session: Session,
     request: Request<Body>,
     next: Next,
 ) -> Response {

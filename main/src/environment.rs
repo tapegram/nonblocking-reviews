@@ -1,4 +1,4 @@
-use std::env;
+
 
 use dotenvy::dotenv;
 use tracing::instrument;

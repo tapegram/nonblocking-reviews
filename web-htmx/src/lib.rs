@@ -4,7 +4,7 @@ use axum::{
     routing::get,
     Router,
 };
-use axum_login::login_required;
+
 use http::StatusCode;
 use rscx::html;
 use state::WebHtmxState;
