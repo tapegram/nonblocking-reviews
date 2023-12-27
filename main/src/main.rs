@@ -6,7 +6,7 @@ use axum::{
 use axum_login::{tower_sessions::SessionManagerLayer, AuthManagerLayerBuilder};
 
 use environment::load_environment;
-use std::{net::SocketAddr};
+use std::net::SocketAddr;
 use tower::ServiceBuilder;
 
 use tower_sessions::{cookie::time::Duration, Expiry, MemoryStore};
@@ -14,6 +14,7 @@ use web_htmx::{livereload, routes as web_routes, state::WebHtmxState};
 
 mod auth;
 mod environment;
+mod github_webhook_adapter;
 
 #[tokio::main]
 async fn main() {
@@ -29,6 +30,7 @@ async fn main() {
 
     let app = Router::new()
         .merge(web_routes(web_htmx_state))
+        .merge(github_webhook_adapter::github_webhook_handler())
         .route("/healthcheck", get(get_health_check));
 
     // Auth and session setup

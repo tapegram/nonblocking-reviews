@@ -1,4 +1,4 @@
-# WallChart for Y'all
+# Nonblocking Reviews with ML
 
 ## Installing/Running
 
@@ -24,11 +24,6 @@ cargo watch -x run
 ## Code generation
 
 We are experimenting with code generation tools (using plopjs). run `./generate.sh` to enter the code generation dialogue.
-
-## MiroBoard
-
-This board contains our stories, kanban board and all other supplemental material.
-https://miro.com/app/board/uXjVNffAsKM=/?share_link_id=874499028180
 
 ## Architecture & Tech Stack
 
