@@ -20,6 +20,7 @@ pub struct MongoPushRepository {
 
 const DATABASE_NAME: &str = "review-stream";
 const PUSHES_COLLECTION: &str = "pushes";
+
 impl MongoPushRepository {
     pub fn from_client(client: &mongodb::Client) -> Result<Self, mongodb::error::Error> {
         let db = client.database(DATABASE_NAME);
