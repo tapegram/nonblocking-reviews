@@ -6,7 +6,7 @@ use axum::{
 use axum_login::{tower_sessions::SessionManagerLayer, AuthManagerLayerBuilder};
 
 use environment::load_environment;
-use github_webhook_handler::handler::github_webhook_handler;
+use github_webhook_handler::handler::{github_webhook_handler, GithubWebhookHandler};
 use mongo_push_repository::mongo_push_repository::MongoPushRepository;
 use review_stream_service::service::ReviewStreamService;
 use std::{net::SocketAddr, sync::Arc};
@@ -34,6 +34,9 @@ async fn main() {
     );
 
     let review_stream_service = ReviewStreamService::new(push_repository);
+    let github_webhook_handler_state = GithubWebhookHandler {
+        review_stream_service: Arc::new(review_stream_service),
+    };
 
     // Create WebHtmxState
     // This is how you can inject dependencies into the web-htmx crate
@@ -45,7 +48,7 @@ async fn main() {
 
     let app = Router::new()
         .merge(web_routes(web_htmx_state))
-        .merge(github_webhook_handler())
+        .merge(github_webhook_handler(github_webhook_handler_state))
         .route("/healthcheck", get(get_health_check));
 
     // Auth and session setup

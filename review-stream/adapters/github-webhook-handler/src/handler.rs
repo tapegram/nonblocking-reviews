@@ -1,6 +1,9 @@
+use std::sync::Arc;
+
 use axum::{extract::Request, routing::post, Router};
 use http_body_util::BodyExt;
 use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
+use review_stream_service::service::ReviewStreamService;
 use tracing::{info, warn};
 
 async fn handle_github_webhook(request: Request) -> () {
@@ -24,6 +27,13 @@ async fn handle_github_webhook(request: Request) -> () {
     };
 }
 
-pub fn github_webhook_handler() -> Router {
-    Router::new().route("/github-webhook", post(handle_github_webhook))
+#[derive(Clone)]
+pub struct GithubWebhookHandler {
+    pub review_stream_service: Arc<ReviewStreamService>,
+}
+
+pub fn github_webhook_handler(state: GithubWebhookHandler) -> Router {
+    Router::new()
+        .route("/github-webhook", post(handle_github_webhook))
+        .with_state(state.clone())
 }
