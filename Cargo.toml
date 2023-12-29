@@ -5,6 +5,7 @@ members = [
           ##PLOP NEW PACKAGE HOOK##
           "review-stream/review-stream-service",
           "review-stream/adapters/mongo-push-repository",
+          "review-stream/adapters/github-webhook-handler",
           "libs/mongo-testcontainer",
           "main",
           "web-client",
