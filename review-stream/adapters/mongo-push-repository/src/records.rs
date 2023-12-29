@@ -21,24 +21,26 @@ pub struct PushRecord {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CommitRecord {
+    pub id: String,
+    pub message: String,
     pub timestamp: String,
     pub url: String,
-    pub author: Author,
-    pub committer: Committer,
+    pub author: AuthorRecord,
+    pub committer: CommitterRecord,
     pub added: Vec<String>,
     pub removed: Vec<String>,
     pub modified: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Author {
+pub struct AuthorRecord {
     pub name: String,
     pub email: String,
     pub username: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Committer {
+pub struct CommitterRecord {
     pub name: String,
     pub email: String,
     pub username: String,
