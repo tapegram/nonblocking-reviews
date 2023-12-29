@@ -7,18 +7,18 @@ use tracing::instrument;
 * necessary
 */
 pub struct Environment {
-    github_app_config: GithubAppConfig,
-    review_stream_config: ReviewStreamConfig,
+    pub github_app_config: GithubAppConfig,
+    pub review_stream_config: ReviewStreamConfig,
 }
 
 pub struct GithubAppConfig {
-    app_id: String,
-    private_key_path: String,
-    webhook_secret: String,
+    pub app_id: String,
+    pub private_key_path: String,
+    pub webhook_secret: String,
 }
 
 pub struct ReviewStreamConfig {
-    mongo_url: String,
+    pub mongo_url: String,
 }
 
 /**

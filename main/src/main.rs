@@ -6,7 +6,9 @@ use axum::{
 use axum_login::{tower_sessions::SessionManagerLayer, AuthManagerLayerBuilder};
 
 use environment::load_environment;
-use std::net::SocketAddr;
+use mongo_push_repository::mongo_push_repository::MongoPushRepository;
+use review_stream_service::service::ReviewStreamService;
+use std::{net::SocketAddr, sync::Arc};
 use tower::ServiceBuilder;
 
 use tower_sessions::{cookie::time::Duration, Expiry, MemoryStore};
@@ -22,8 +24,16 @@ async fn main() {
     // https://docs.rs/tracing-subscriber/latest/tracing_subscriber/fmt/fn.init.html
     tracing_subscriber::fmt::init();
 
-    let _env = load_environment();
+    let env = load_environment();
 
+    // Create review stream service
+    let push_repository = Arc::new(
+        MongoPushRepository::new(&env.review_stream_config.mongo_url)
+            .await
+            .expect("Could not create push repository"),
+    );
+
+    let review_stream_service = ReviewStreamService::new(push_repository);
     // Create WebHtmxState
     // This is how you can inject dependencies into the web-htmx crate
     // like a backend service

@@ -1,23 +1,18 @@
+use std::sync::Arc;
 
-
-
+use crate::ports::push_repository::PushRepository;
 
 #[derive(Clone)]
 pub struct ReviewStreamService {
     //##PLOP INSERT COMMAND HOOK##
-    // Add service infra dependencies here
-}
-
-impl Default for ReviewStreamService {
-    fn default() -> Self {
-        Self::new()
-    }
+    pub push_repository: Arc<dyn PushRepository>,
 }
 
 impl ReviewStreamService {
-    pub fn new() -> Self {
+    pub fn new(push_repository: Arc<dyn PushRepository>) -> Self {
         Self {
             //##PLOP INSERT COMMAND INSTANTIATION HOOK##
+            push_repository,
         }
     }
     //##PLOP INSERT DELEGATE HOOK##
