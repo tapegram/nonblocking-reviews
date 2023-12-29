@@ -34,6 +34,7 @@ async fn main() {
     );
 
     let review_stream_service = ReviewStreamService::new(push_repository);
+
     // Create WebHtmxState
     // This is how you can inject dependencies into the web-htmx crate
     // like a backend service
