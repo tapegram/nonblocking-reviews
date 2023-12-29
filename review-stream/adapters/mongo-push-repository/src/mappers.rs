@@ -80,3 +80,62 @@ impl CommitterRecord {
         }
     }
 }
+
+fn to_push_record(push: &Push) -> PushRecord {
+    PushRecord {
+        id: push.id.clone(),
+        diff: push.diff.clone(),
+        repository: to_repository_record(&push.repository),
+        pusher: to_pusher_record(&push.pusher),
+        compare_url: push.compare_url.clone(),
+        commits: push.commits.iter().map(|c| to_commit_record(c)).collect(),
+        head_commit: to_commit_record(&push.head_commit),
+    }
+}
+
+fn to_repository_record(repository: &Repository) -> RepositoryRecord {
+    RepositoryRecord {
+        id: repository.id.clone(),
+        name: repository.name.clone(),
+        full_name: repository.full_name.clone(),
+        default_branch: repository.default_branch.clone(),
+        master_branch: repository.master_branch.clone(),
+    }
+}
+
+fn to_commit_record(commit: &Commit) -> CommitRecord {
+    CommitRecord {
+        added: commit.added.clone(),
+        author: to_author_record(&commit.author),
+        committer: to_committer_record(&commit.committer),
+        id: commit.id.clone(),
+        message: commit.message.clone(),
+        modified: commit.modified.clone(),
+        removed: commit.removed.clone(),
+        timestamp: commit.timestamp.clone(),
+        url: commit.url.clone(),
+    }
+}
+
+fn to_author_record(author: &Author) -> AuthorRecord {
+    AuthorRecord {
+        name: author.name.clone(),
+        email: author.email.clone(),
+        username: author.username.clone(),
+    }
+}
+
+fn to_committer_record(committer: &Committer) -> CommitterRecord {
+    CommitterRecord {
+        name: committer.name.clone(),
+        email: committer.email.clone(),
+        username: committer.username.clone(),
+    }
+}
+
+fn to_pusher_record(pusher: &Pusher) -> PusherRecord {
+    PusherRecord {
+        name: pusher.name.clone(),
+        email: pusher.email.clone(),
+    }
+}
