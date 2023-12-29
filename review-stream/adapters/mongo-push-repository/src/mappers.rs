@@ -81,7 +81,7 @@ impl CommitterRecord {
     }
 }
 
-fn to_push_record(push: &Push) -> PushRecord {
+pub fn to_push_record(push: &Push) -> PushRecord {
     PushRecord {
         id: push.id.clone(),
         diff: push.diff.clone(),

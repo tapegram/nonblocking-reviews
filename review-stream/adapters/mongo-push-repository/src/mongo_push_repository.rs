@@ -6,9 +6,8 @@ use review_stream_service::{
     models::Push,
     ports::push_repository::{PushRepository, RepositoryFailure},
 };
-use serde::{Deserialize, Serialize};
 
-use crate::records::PushRecord;
+use crate::{mappers::to_push_record, records::PushRecord};
 
 #[derive(Clone, Debug)]
 pub struct MongoPushRepository {
@@ -49,16 +48,15 @@ impl PushRepository for MongoPushRepository {
     }
 
     async fn save(&self, push: Push) -> Result<(), RepositoryFailure> {
-        // let filter = doc! {"id": worksite.id.clone()};
-        // let record = to_worksite_record(&worksite);
-        // let options = mongodb::options::ReplaceOptions::builder()
-        //     .upsert(true)
-        //     .build();
-        // self.collection
-        //     .replace_one(filter, record, options)
-        //     .await
-        //     .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
-        // Ok(())
-        todo!("")
+        let filter = doc! {"id": push.id.clone()};
+        let record = to_push_record(&push);
+        let options = mongodb::options::ReplaceOptions::builder()
+            .upsert(true)
+            .build();
+        self.collection
+            .replace_one(filter, record, options)
+            .await
+            .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
+        Ok(())
     }
 }
