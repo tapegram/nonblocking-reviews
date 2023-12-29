@@ -17,6 +17,7 @@ mongo-push-repository = { path = "../review-stream/adapters/mongo-push-repositor
 octocrab = { workspace = true }
 rand = { workspace = true, features = ["min_const_gen"] }
 review-stream-service = { path = "../review-stream/review-stream-service" }
+github-webhook-handler = { path = "../review-stream/adapters/github-webhook-handler" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true, features = ["full"] }

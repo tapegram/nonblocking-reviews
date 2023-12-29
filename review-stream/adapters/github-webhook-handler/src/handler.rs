@@ -1,33 +1,7 @@
-use axum::{
-    body::{Body, HttpBody},
-    extract::Request,
-    http::request::Parts,
-    routing::post,
-    Json, Router,
-};
+use axum::{extract::Request, routing::post, Router};
 use http_body_util::BodyExt;
 use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
 use tracing::{info, warn};
-
-// async fn process_github_webhook(payload: axum::extract::Json<Value>) -> &'static str {
-//     // request_from_github is the HTTP request your webhook handler received
-//     let (parts, body) = request_from_github.into_parts();
-//     let header = parts
-//         .headers
-//         .get("X-GitHub-Event")
-//         .unwrap()
-//         .to_str()
-//         .unwrap();
-
-//     let event = WebhookEvent::try_from_header_and_body(header, &body).unwrap();
-//     // Now you can match on event type and call any specific handling logic
-//     match event.kind {
-//         WebhookEventType::Ping => info!("Received a ping"),
-//         WebhookEventType::PullRequest => info!("Received a pull request event"),
-//         // ...
-//         _ => warn!("Ignored event"),
-//     };
-// }
 
 async fn handle_github_webhook(request: Request) -> () {
     // request_from_github is the HTTP request your webhook handler received
