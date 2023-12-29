@@ -31,7 +31,11 @@ impl HandleGithubPush {
             _ => return Err(HandleGithubPushFailure::NotAPushEvent),
         };
 
-        todo!("")
+        self.push_repository
+            .save(push_event.into())
+            .await
+            .map_err(|e| HandleGithubPushFailure::Unknown(e.to_string()))?;
+        Ok(())
     }
 }
 
