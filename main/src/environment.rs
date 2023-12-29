@@ -8,12 +8,17 @@ use tracing::instrument;
 */
 pub struct Environment {
     github_app_config: GithubAppConfig,
+    review_stream_config: ReviewStreamConfig,
 }
 
 pub struct GithubAppConfig {
     app_id: String,
     private_key_path: String,
     webhook_secret: String,
+}
+
+pub struct ReviewStreamConfig {
+    mongo_url: String,
 }
 
 /**
@@ -29,6 +34,9 @@ pub fn load_environment() -> Environment {
                 .expect("GITHUB_PRIVATE_KEY_PATH must be set"),
             webhook_secret: std::env::var("GITHUB_WEBHOOK_SECRET")
                 .expect("GITHUB_WEBHOOK_SECRET must be set"),
+        },
+        review_stream_config: ReviewStreamConfig {
+            mongo_url: std::env::var("MONGO_URL").expect("MONGO_URL must be set"),
         },
     }
 }

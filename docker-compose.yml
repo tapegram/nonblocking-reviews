@@ -1,16 +1,16 @@
 version: '3'
 services:
-  auth_mongo:
+  mongo:
     ports:
       - "27017:27017"
-    container_name: auth-mongo
+    container_name: mongo
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
     image: mongo:7.0.4
     volumes: 
-      - auth_mongo_data:/data/db
+      - mongo_data:/data/db
 
   mongo-express:
     image: mongo-express
@@ -22,5 +22,5 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
       ME_CONFIG_MONGODB_URL: mongodb://root:password@auth_mongo:27017/
 volumes:
-  auth_mongo_data:
+  mongo_data:
       
