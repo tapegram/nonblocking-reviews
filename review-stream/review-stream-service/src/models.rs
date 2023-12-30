@@ -1,3 +1,5 @@
+use chrono::{DateTime, Utc};
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Push {
     pub id: String,
@@ -21,7 +23,7 @@ pub struct Push {
 pub struct Commit {
     pub id: String,
     pub message: String,
-    pub timestamp: String,
+    pub timestamp: DateTime<Utc>,
     pub url: String,
     pub author: Author,
     pub committer: Committer,
@@ -50,7 +52,6 @@ pub struct Repository {
     pub name: String,
     pub full_name: String,
     pub default_branch: String,
-    pub master_branch: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

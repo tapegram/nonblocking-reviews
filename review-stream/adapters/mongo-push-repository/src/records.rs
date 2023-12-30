@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -23,7 +24,7 @@ pub struct PushRecord {
 pub struct CommitRecord {
     pub id: String,
     pub message: String,
-    pub timestamp: String,
+    pub timestamp: DateTime<Utc>,
     pub url: String,
     pub author: AuthorRecord,
     pub committer: CommitterRecord,
@@ -52,7 +53,6 @@ pub struct RepositoryRecord {
     pub name: String,
     pub full_name: String,
     pub default_branch: String,
-    pub master_branch: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

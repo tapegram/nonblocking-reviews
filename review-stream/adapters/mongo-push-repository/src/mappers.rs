@@ -47,7 +47,6 @@ impl RepositoryRecord {
             name: self.name.clone(),
             full_name: self.full_name.clone(),
             default_branch: self.default_branch.clone(),
-            master_branch: self.master_branch.clone(),
         }
     }
 }
@@ -99,7 +98,6 @@ fn to_repository_record(repository: &Repository) -> RepositoryRecord {
         name: repository.name.clone(),
         full_name: repository.full_name.clone(),
         default_branch: repository.default_branch.clone(),
-        master_branch: repository.master_branch.clone(),
     }
 }
 

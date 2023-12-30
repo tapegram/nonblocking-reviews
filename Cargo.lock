@@ -1772,10 +1772,12 @@ name = "review-stream-service"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "chrono",
  "octocrab",
  "thiserror",
  "tokio",
  "tracing",
+ "uuid",
 ]
 
 [[package]]
