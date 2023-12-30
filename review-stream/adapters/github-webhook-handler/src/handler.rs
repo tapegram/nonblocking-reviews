@@ -37,7 +37,7 @@ async fn handle_github_webhook(
     let event: WebhookEvent = WebhookEvent::try_from_header_and_body(header, &body).unwrap();
     // Now you can match on event type and call any specific handling logic
     match event.kind {
-        WebhookEventType::Ping => info!("Received a ping!"),
+        WebhookEventType::Ping => info!("Received a ping"),
         WebhookEventType::PullRequest => info!("Received a pull request event"),
         WebhookEventType::Push => {
             info!("Received a push event {:?}", event);
