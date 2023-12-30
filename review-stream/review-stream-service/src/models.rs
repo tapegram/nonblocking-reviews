@@ -17,6 +17,7 @@ pub struct Push {
 
     pub commits: Vec<Commit>,
     pub head_commit: Commit,
+    pub branch_ref: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

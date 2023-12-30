@@ -49,6 +49,7 @@ fn to_push(
 ) -> Push {
     Push {
         id: uuid::Uuid::new_v4().to_string(), // This dependency should be hoisted out
+        branch_ref: payload.r#ref.clone(),
         diff: diff.into(), // This should be passed in as well. Requires an extra query to github
         repository: to_repository(repository),
         pusher: Pusher {

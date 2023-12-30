@@ -20,6 +20,7 @@ impl PushRecord {
             compare_url: self.compare_url.clone(),
             commits: self.commits.iter().map(|c| c.to_commit()).collect(),
             head_commit: self.head_commit.to_commit(),
+            branch_ref: self.branch_ref.clone(),
         }
     }
 }
@@ -89,6 +90,7 @@ pub fn to_push_record(push: &Push) -> PushRecord {
         compare_url: push.compare_url.clone(),
         commits: push.commits.iter().map(|c| to_commit_record(c)).collect(),
         head_commit: to_commit_record(&push.head_commit),
+        branch_ref: push.branch_ref.clone(),
     }
 }
 
