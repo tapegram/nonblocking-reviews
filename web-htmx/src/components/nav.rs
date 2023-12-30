@@ -1,7 +1,5 @@
 use rscx::{component, html, props, CollectFragment};
 
-
-
 use web_client::server::popup_menu::{Menu, PopupMenu};
 
 use crate::components::logo::Logo;
@@ -11,7 +9,7 @@ use crate::routes;
 pub fn Nav() -> String {
     let ctx: crate::context::Context =
         crate::context::context().expect("Unable to retrieve htmx context.");
-    let nav_links: Vec<(&str, String)> = vec![("Home", routes::home())];
+    let nav_links: Vec<(&str, String)> = vec![("Home", routes::home()), ("Feed", routes::feed())];
 
     html! {
         <nav class="border-b border-gray-200 bg-white">

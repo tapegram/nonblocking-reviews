@@ -21,7 +21,7 @@ pub fn home() -> String {
 pub const HOME_REDIRECT: &str = PLAYGROUND;
 
 #[cfg(not(debug_assertions))]
-pub const HOME_REDIRECT: &str = WALLCHART;
+pub const HOME_REDIRECT: &str = FEED;
 
 pub const PLAYGROUND: &str = "/playground";
 pub fn _playground() -> String {
@@ -31,4 +31,9 @@ pub fn _playground() -> String {
 pub const CLIENT: &str = "/client";
 pub fn _client() -> String {
     CLIENT.into()
+}
+
+pub const FEED: &str = "/feed";
+pub fn feed() -> String {
+    FEED.into()
 }
