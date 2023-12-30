@@ -20,6 +20,7 @@ use tracing::{info, warn};
 async fn handle_github_webhook(
     State(GithubWebhookHandler {
         review_stream_service,
+        octocrab_client,
     }): State<GithubWebhookHandler>,
     request: Request,
 ) -> () {
@@ -64,6 +65,7 @@ async fn handle_github_webhook(
 #[derive(Clone)]
 pub struct GithubWebhookHandler {
     pub review_stream_service: Arc<ReviewStreamService>,
+    pub octocrab_client: Octocrab,
 }
 
 pub fn github_webhook_handler(state: GithubWebhookHandler) -> Router {

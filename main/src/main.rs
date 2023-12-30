@@ -51,9 +51,10 @@ async fn main() {
             .expect("Could not create push repository"),
     );
 
-    let review_stream_service = ReviewStreamService::new(push_repository, octocrab);
+    let review_stream_service = ReviewStreamService::new(push_repository, octocrab.clone());
     let github_webhook_handler_state = GithubWebhookHandler {
         review_stream_service: Arc::new(review_stream_service),
+        octocrab_client: octocrab,
     };
 
     // Create WebHtmxState
