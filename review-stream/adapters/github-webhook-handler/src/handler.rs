@@ -50,10 +50,17 @@ async fn handle_github_webhook(
             let repository: octocrab::models::Repository =
                 event.repository.expect("Expected repository");
 
+            let compare_url: String = push_event.as_ref().compare.to_string();
+            let diff: String = octocrab_client
+                .get(format!("{}.diff", &compare_url), None::<&()>)
+                .await
+                .expect("Failed to get diff of the commit");
+
             review_stream_service
                 .handle_github_push(HandleGithubPushInput {
                     github_event: *push_event,
                     repository,
+                    diff,
                 })
                 .await
                 .expect("Failed to handle push webhook")

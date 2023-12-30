@@ -23,6 +23,7 @@ pub struct HandleGithubPushInput {
     // Put input fields here
     pub github_event: PushWebhookEventPayload,
     pub repository: octocrab::models::Repository,
+    pub diff: String,
 }
 
 // Change the return type, if needed
@@ -30,22 +31,7 @@ pub type HandleGithubPushOutput = Result<(), HandleGithubPushFailure>;
 
 impl HandleGithubPush {
     pub async fn handle_github_push(&self, input: HandleGithubPushInput) -> HandleGithubPushOutput {
-        // let compare_url: String = push_event.as_ref().compare.to_string();
-        // let diff_response = self
-        //     .octocrab_client
-        //     ._get(format!("{}.diff", &compare_url))
-        //     .await
-        //     .map_err(|e| HandleGithubPushFailure::Unknown(e.to_string()))?;
-        //
-        // if !diff_response.status().is_success() {
-        //     return Err(HandleGithubPushFailure::Unknown(
-        //         "Failed to get diff of the commit".into(),
-        //     ));
-        // }
-        //
-        // diff_response.body_mut().collect().await.unwrap().to_bytes();
-
-        let push: Push = to_push(&input.github_event, &input.repository);
+        let push: Push = to_push(&input.github_event, &input.repository, &input.diff);
 
         self.push_repository
             .save(push)
@@ -56,10 +42,14 @@ impl HandleGithubPush {
     }
 }
 
-fn to_push(payload: &PushWebhookEventPayload, repository: &octocrab::models::Repository) -> Push {
+fn to_push(
+    payload: &PushWebhookEventPayload,
+    repository: &octocrab::models::Repository,
+    diff: &String,
+) -> Push {
     Push {
         id: uuid::Uuid::new_v4().to_string(), // This dependency should be hoisted out
-        diff: "".into(), // This should be passed in as well. Requires an extra query to github
+        diff: diff.into(), // This should be passed in as well. Requires an extra query to github
         repository: to_repository(repository),
         pusher: Pusher {
             name: payload.pusher.user.name.clone(),
