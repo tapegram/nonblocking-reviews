@@ -93,7 +93,7 @@ async fn main() {
     #[cfg(debug_assertions)]
     let app = app.layer(livereload::layer());
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3001));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     axum::serve(listener, app.into_make_service())
         .await
