@@ -34,6 +34,7 @@ async fn handle_github_webhook(
         .unwrap();
 
     let body = body.collect().await.unwrap().to_bytes();
+
     let event: WebhookEvent = WebhookEvent::try_from_header_and_body(header, &body).unwrap();
     // Now you can match on event type and call any specific handling logic
     match event.kind {
