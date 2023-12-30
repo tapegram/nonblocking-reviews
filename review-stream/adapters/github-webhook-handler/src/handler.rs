@@ -53,8 +53,10 @@ async fn handle_github_webhook(
                 event.repository.expect("Expected repository");
 
             let compare_url: String = push_event.as_ref().compare.to_string();
-            let diff: String = octocrab_client
-                .get(format!("{}.diff", &compare_url), None::<&()>)
+            let diff = reqwest::get(format!("{}.diff", &compare_url))
+                .await
+                .expect("Failed to get diff of the commit")
+                .text()
                 .await
                 .expect("Failed to get diff of the commit");
 
