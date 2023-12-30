@@ -1,12 +1,23 @@
 use std::sync::Arc;
 
-use axum::{extract::Request, routing::post, Router};
+use axum::{
+    extract::{Request, State},
+    routing::post,
+    Router,
+};
 use http_body_util::BodyExt;
 use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
-use review_stream_service::service::ReviewStreamService;
+use review_stream_service::{
+    handle_github_push::HandleGithubPushInput, service::ReviewStreamService,
+};
 use tracing::{info, warn};
 
-async fn handle_github_webhook(request: Request) -> () {
+async fn handle_github_webhook(
+    State(GithubWebhookHandler {
+        review_stream_service,
+    }): State<GithubWebhookHandler>,
+    request: Request,
+) -> () {
     // request_from_github is the HTTP request your webhook handler received
     let (parts, body) = request.into_parts();
     let header = parts
@@ -22,7 +33,15 @@ async fn handle_github_webhook(request: Request) -> () {
     match event.kind {
         WebhookEventType::Ping => info!("Received a ping"),
         WebhookEventType::PullRequest => info!("Received a pull request event"),
-        WebhookEventType::Push => info!("Received a push event {:?}", event),
+        WebhookEventType::Push => {
+            info!("Received a push event {:?}", event);
+            review_stream_service
+                .handle_github_push(HandleGithubPushInput {
+                    github_event: event,
+                })
+                .await
+                .expect("Failed to handle push webhook")
+        }
         _ => warn!("Ignored event {:?}", event),
     };
 }
