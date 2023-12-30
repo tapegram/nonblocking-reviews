@@ -24,6 +24,7 @@ async fn handle_github_webhook(
     }): State<GithubWebhookHandler>,
     request: Request,
 ) -> () {
+    print!("Received a github webhook request {:?}", request);
     warn!("Received a github webhook request {:?}", request);
     // request_from_github is the HTTP request your webhook handler received
     let (parts, body) = request.into_parts();
