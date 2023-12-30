@@ -1218,6 +1218,7 @@ dependencies = [
  "dotenvy",
  "github-webhook-handler",
  "http-body-util",
+ "jsonwebtoken",
  "mongo-push-repository",
  "octocrab",
  "rand",
@@ -1773,6 +1774,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "chrono",
+ "http-body-util",
  "octocrab",
  "thiserror",
  "tokio",

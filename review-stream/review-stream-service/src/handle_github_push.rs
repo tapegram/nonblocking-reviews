@@ -10,19 +10,19 @@ use crate::{
     models::{Author, Commit, Committer, Push, Pusher, Repository},
     ports::push_repository::PushRepository,
 };
+use http_body_util::BodyExt;
 
 #[derive(Clone)]
 pub struct HandleGithubPush {
     pub push_repository: Arc<dyn PushRepository>,
+    pub octocrab_client: octocrab::Octocrab,
 }
 
 #[derive(Clone, Debug)]
 pub struct HandleGithubPushInput {
     // Put input fields here
-    // For lazy mapping reasons, just reusing the generic octocrab github event type and checking
-    // its push at runtime. We could add more mapping and "parse dont validate" this into the
-    // adapter.
-    pub github_event: WebhookEvent,
+    pub github_event: PushWebhookEventPayload,
+    pub repository: octocrab::models::Repository,
 }
 
 // Change the return type, if needed
@@ -30,17 +30,22 @@ pub type HandleGithubPushOutput = Result<(), HandleGithubPushFailure>;
 
 impl HandleGithubPush {
     pub async fn handle_github_push(&self, input: HandleGithubPushInput) -> HandleGithubPushOutput {
-        let push_event: Box<PushWebhookEventPayload> = match input.github_event.specific {
-            WebhookEventPayload::Push(push_event) => push_event,
-            _ => return Err(HandleGithubPushFailure::NotAPushEvent),
-        };
+        // let compare_url: String = push_event.as_ref().compare.to_string();
+        // let diff_response = self
+        //     .octocrab_client
+        //     ._get(format!("{}.diff", &compare_url))
+        //     .await
+        //     .map_err(|e| HandleGithubPushFailure::Unknown(e.to_string()))?;
+        //
+        // if !diff_response.status().is_success() {
+        //     return Err(HandleGithubPushFailure::Unknown(
+        //         "Failed to get diff of the commit".into(),
+        //     ));
+        // }
+        //
+        // diff_response.body_mut().collect().await.unwrap().to_bytes();
 
-        let repository: octocrab::models::Repository = input
-            .github_event
-            .repository
-            .ok_or(HandleGithubPushFailure::NoRepository)?;
-
-        let push: Push = to_push(push_event.as_ref(), &repository);
+        let push: Push = to_push(&input.github_event, &input.repository);
 
         self.push_repository
             .save(push)

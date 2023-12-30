@@ -28,3 +28,4 @@ tower-sessions = { workspace = true, features = ["mongodb-store"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 web-htmx = { path = "../web-htmx" }
+jsonwebtoken = { workspace = true }

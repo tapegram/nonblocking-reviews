@@ -58,3 +58,4 @@ tracing-subscriber = { version = "0.3.17" }
 typed-builder = { version = "0.18.0" }
 uuid = { version = "1.4.1" }
 validator = { version = "0.16.1", features = ["derive"] }
+jsonwebtoken = { version = "9.2.0" }

@@ -6,7 +6,12 @@ use axum::{
     Router,
 };
 use http_body_util::BodyExt;
-use octocrab::models::webhook_events::{WebhookEvent, WebhookEventType};
+use octocrab::{
+    models::webhook_events::{
+        payload::PushWebhookEventPayload, WebhookEvent, WebhookEventPayload, WebhookEventType,
+    },
+    Octocrab,
+};
 use review_stream_service::{
     handle_github_push::HandleGithubPushInput, service::ReviewStreamService,
 };
@@ -35,9 +40,19 @@ async fn handle_github_webhook(
         WebhookEventType::PullRequest => info!("Received a pull request event"),
         WebhookEventType::Push => {
             info!("Received a push event {:?}", event);
+
+            let push_event: Box<PushWebhookEventPayload> = match event.specific {
+                WebhookEventPayload::Push(push_event) => push_event,
+                _ => panic!("Expected push event"),
+            };
+
+            let repository: octocrab::models::Repository =
+                event.repository.expect("Expected repository");
+
             review_stream_service
                 .handle_github_push(HandleGithubPushInput {
-                    github_event: event,
+                    github_event: *push_event,
+                    repository,
                 })
                 .await
                 .expect("Failed to handle push webhook")
