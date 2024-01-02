@@ -63,3 +63,16 @@ pub struct Pusher {
     pub name: String,
     pub email: String,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Feed {
+    pub items: Vec<Item>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Item {
+    pub summary: String,
+    pub link: String,
+    pub author: String,
+    pub timestamp: DateTime<Utc>,
+}

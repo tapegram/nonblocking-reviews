@@ -2,24 +2,22 @@ use std::sync::Arc;
 
 use thiserror::Error;
 
+use crate::{models::Feed, ports::push_repository::PushRepository};
+
 // Example repo dependency
 // use crate::ports::worksite_repository::WorksiteRepository;
 
 #[derive(Clone)]
 pub struct GetFeed {
     // Put infra dependencies in this struct
-    // Below is an example of a repo dependency
-    // pub worksite_repository: Arc<dyn WorksiteRepository>,
+    pub push_repository: Arc<dyn PushRepository>,
 }
 
 #[derive(Clone, Debug)]
-pub struct GetFeedInput {
-    // Put input fields here
-    pub id: String
-}
+pub struct GetFeedInput {}
 
 // Change the return type, if needed
-pub type GetFeedOutput = Result<(), GetFeedFailure>;
+pub type GetFeedOutput = Result<Feed, GetFeedFailure>;
 
 impl GetFeed {
     pub async fn get_feed(&self, input: GetFeedInput) -> GetFeedOutput {

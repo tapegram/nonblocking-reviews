@@ -20,7 +20,7 @@ impl ReviewStreamService {
         Self {
             //##PLOP INSERT COMMAND INSTANTIATION HOOK##
             get_feed: GetFeed {
-              // Add any dependencies for the command here. They should be passed into this function and supplied by main.rs.
+                push_repository: push_repository.clone(),
             },
             handle_github_push: HandleGithubPush {
                 push_repository: push_repository.clone(),
