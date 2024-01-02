@@ -95,7 +95,7 @@ async fn handle_github_webhook(
                 .await
                 .expect("Failed to handle push webhook")
         }
-        _ => warn!("Ignored event {:?}", event),
+        _ => warn!("Ignoring event {:?}", event),
     };
 }
 
