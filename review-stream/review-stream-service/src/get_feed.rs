@@ -20,8 +20,24 @@ pub struct GetFeedInput {}
 pub type GetFeedOutput = Result<Feed, GetFeedFailure>;
 
 impl GetFeed {
-    pub async fn get_feed(&self, input: GetFeedInput) -> GetFeedOutput {
-        todo!("Implement get_feed")
+    pub async fn get_feed(&self, _input: GetFeedInput) -> GetFeedOutput {
+        let pushes = self
+            .push_repository
+            .get_all_pushes(25)
+            .await
+            .map_err(|e| GetFeedFailure::Unknown(e.to_string()))?;
+
+        let items = pushes.into_iter().map(|p| to_feed_item(p)).collect();
+        Ok(Feed { items })
+    }
+}
+
+fn to_feed_item(push: crate::models::Push) -> crate::models::Item {
+    crate::models::Item {
+        timestamp: push.head_commit.timestamp,
+        summary: push.summary,
+        author: push.head_commit.author.username,
+        link: push.compare_url,
     }
 }
 
