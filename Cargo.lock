@@ -3296,6 +3296,7 @@ dependencies = [
  "futures",
  "http 1.0.0",
  "once_cell",
+ "review-stream-service",
  "rscx",
  "serde",
  "serde_json",

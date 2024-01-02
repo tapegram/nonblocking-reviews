@@ -51,9 +51,10 @@ async fn main() {
             .expect("Could not create push repository"),
     );
 
-    let review_stream_service = ReviewStreamService::new(push_repository, octocrab.clone());
+    let review_stream_service =
+        Arc::new(ReviewStreamService::new(push_repository, octocrab.clone()));
     let github_webhook_handler_state = GithubWebhookHandler {
-        review_stream_service: Arc::new(review_stream_service),
+        review_stream_service: review_stream_service.clone(),
         octocrab_client: octocrab,
         ml_api_key: env.review_stream_config.ml_api_key,
     };
@@ -64,6 +65,7 @@ async fn main() {
     // TODO: include an example
     let web_htmx_state = WebHtmxState {
         flash_config: axum_flash::Config::new(axum_flash::Key::generate()),
+        review_feed_service: review_stream_service,
     };
 
     let app = Router::new()

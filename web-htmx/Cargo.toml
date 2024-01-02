@@ -23,3 +23,4 @@ web-client = { path = "../web-client" }
 web-macros = { path = "../web-macros" }
 futures = { workspace = true }
 validator = { workspace = true }
+review-stream-service = { path = "../review-stream/review-stream-service" }
