@@ -18,6 +18,9 @@ pub struct Push {
     pub commits: Vec<Commit>,
     pub head_commit: Commit,
     pub branch_ref: String,
+
+    pub summary: String, // This is the ML generated summary. This should probably be in a
+                         // different record but we are just prototyping to learn AI stuff.
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

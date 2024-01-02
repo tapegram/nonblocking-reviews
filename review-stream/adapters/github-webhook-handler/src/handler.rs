@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use axum::{
     extract::{Request, State},
@@ -15,6 +15,7 @@ use octocrab::{
 use review_stream_service::{
     handle_github_push::HandleGithubPushInput, service::ReviewStreamService,
 };
+use serde::{Deserialize, Serialize};
 use tracing::{info, warn};
 
 async fn handle_github_webhook(
@@ -60,11 +61,36 @@ async fn handle_github_webhook(
                 .await
                 .expect("Failed to get diff of the commit");
 
+            let mut ml_summary_json_body = HashMap::new();
+            ml_summary_json_body.insert("body", diff.clone());
+
+            #[derive(Serialize, Deserialize)]
+            struct Summary {
+                summary: GeneratedText,
+            }
+            #[derive(Serialize, Deserialize)]
+            struct GeneratedText {
+                generated_text: String,
+            }
+            let client = reqwest::Client::new();
+            let summary_response: Summary = client
+                .post("https://0w10jtv5s9.execute-api.us-east-1.amazonaws.com/prod/diffsummary")
+                .json(&ml_summary_json_body)
+                .header("x-api-key", "FdYYnnC4MnaMW3UaACfBx1b1QfaasTEh6z9v1RmJ") // This key should
+                // be an env var
+                .send()
+                .await
+                .expect("Failed to get summary of the commit")
+                .json()
+                .await
+                .expect("Failed to get summary of the commit");
+
             review_stream_service
                 .handle_github_push(HandleGithubPushInput {
                     github_event: *push_event,
                     repository,
                     diff,
+                    summary: summary_response.summary.generated_text,
                 })
                 .await
                 .expect("Failed to handle push webhook")

@@ -21,6 +21,7 @@ impl PushRecord {
             commits: self.commits.iter().map(|c| c.to_commit()).collect(),
             head_commit: self.head_commit.to_commit(),
             branch_ref: self.branch_ref.clone(),
+            summary: self.summary.clone(),
         }
     }
 }
@@ -91,6 +92,7 @@ pub fn to_push_record(push: &Push) -> PushRecord {
         commits: push.commits.iter().map(|c| to_commit_record(c)).collect(),
         head_commit: to_commit_record(&push.head_commit),
         branch_ref: push.branch_ref.clone(),
+        summary: push.summary.clone(),
     }
 }
 

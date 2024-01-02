@@ -23,7 +23,10 @@ pub struct HandleGithubPushInput {
     // Put input fields here
     pub github_event: PushWebhookEventPayload,
     pub repository: octocrab::models::Repository,
+    // Fetched from github commit api
     pub diff: String,
+    // Fetched from our ML service
+    pub summary: String,
 }
 
 // Change the return type, if needed
@@ -31,7 +34,12 @@ pub type HandleGithubPushOutput = Result<(), HandleGithubPushFailure>;
 
 impl HandleGithubPush {
     pub async fn handle_github_push(&self, input: HandleGithubPushInput) -> HandleGithubPushOutput {
-        let push: Push = to_push(&input.github_event, &input.repository, &input.diff);
+        let push: Push = to_push(
+            &input.github_event,
+            &input.repository,
+            &input.diff,
+            &input.summary,
+        );
 
         self.push_repository
             .save(push)
@@ -46,6 +54,7 @@ fn to_push(
     payload: &PushWebhookEventPayload,
     repository: &octocrab::models::Repository,
     diff: &String,
+    summary: &String,
 ) -> Push {
     Push {
         id: uuid::Uuid::new_v4().to_string(), // This dependency should be hoisted out
@@ -63,6 +72,7 @@ fn to_push(
             .map(|c| to_commit(c))
             .collect::<Vec<_>>(),
         head_commit: to_commit(&payload.head_commit.clone().unwrap()),
+        summary: summary.clone(),
     }
 }
 
