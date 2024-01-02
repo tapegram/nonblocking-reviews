@@ -49,9 +49,13 @@ impl PushRepository for MongoPushRepository {
 
     async fn get_all_pushes(&self, limit: i64) -> Result<Vec<Push>, RepositoryFailure> {
         let filter = doc! { "$match": { "summary": { "$exists": true }}};
+        let options = mongodb::options::FindOptions::builder()
+            .sort(doc! { "timestamp": -1 })
+            .limit(limit)
+            .build();
         let cursor = self
             .collection
-            .find(None, None)
+            .find(filter, options)
             .await
             .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
 
