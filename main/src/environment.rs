@@ -19,6 +19,7 @@ pub struct GithubAppConfig {
 
 pub struct ReviewStreamConfig {
     pub mongo_url: String,
+    pub ml_api_key: String,
 }
 
 /**
@@ -37,6 +38,7 @@ pub fn load_environment() -> Environment {
         },
         review_stream_config: ReviewStreamConfig {
             mongo_url: std::env::var("MONGO_URL").expect("MONGO_URL must be set"),
+            ml_api_key: std::env::var("ML_API_KEY").expect("ML_API_KEY must be set"),
         },
     }
 }

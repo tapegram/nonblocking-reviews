@@ -55,6 +55,7 @@ async fn main() {
     let github_webhook_handler_state = GithubWebhookHandler {
         review_stream_service: Arc::new(review_stream_service),
         octocrab_client: octocrab,
+        ml_api_key: env.review_stream_config.ml_api_key,
     };
 
     // Create WebHtmxState

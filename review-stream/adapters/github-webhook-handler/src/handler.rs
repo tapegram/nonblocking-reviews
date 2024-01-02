@@ -22,6 +22,7 @@ async fn handle_github_webhook(
     State(GithubWebhookHandler {
         review_stream_service,
         octocrab_client,
+        ml_api_key,
     }): State<GithubWebhookHandler>,
     request: Request,
 ) -> () {
@@ -76,8 +77,7 @@ async fn handle_github_webhook(
             let summary_response: Summary = client
                 .post("https://0w10jtv5s9.execute-api.us-east-1.amazonaws.com/prod/diffsummary")
                 .json(&ml_summary_json_body)
-                .header("x-api-key", "FdYYnnC4MnaMW3UaACfBx1b1QfaasTEh6z9v1RmJ") // This key should
-                // be an env var
+                .header("x-api-key", ml_api_key)
                 .send()
                 .await
                 .expect("Failed to get summary of the commit")
@@ -103,6 +103,7 @@ async fn handle_github_webhook(
 pub struct GithubWebhookHandler {
     pub review_stream_service: Arc<ReviewStreamService>,
     pub octocrab_client: Octocrab,
+    pub ml_api_key: String,
 }
 
 pub fn github_webhook_handler(state: GithubWebhookHandler) -> Router {
