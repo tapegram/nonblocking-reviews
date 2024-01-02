@@ -7,6 +7,7 @@ use crate::models::Push;
 pub trait PushRepository: Send + Sync + 'static {
     async fn get_push(&self, id: String) -> Result<Option<Push>, RepositoryFailure>;
     async fn save(&self, push: Push) -> Result<(), RepositoryFailure>;
+    async fn get_all_pushes(&self, limit: i64) -> Result<Vec<Push>, RepositoryFailure>;
 }
 
 #[derive(Error, Debug, PartialEq)]

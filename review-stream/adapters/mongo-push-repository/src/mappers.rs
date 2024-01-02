@@ -11,7 +11,7 @@ impl From<PushRecord> for Push {
 }
 
 impl PushRecord {
-    fn to_push(&self) -> Push {
+    pub fn to_push(&self) -> Push {
         Push {
             id: self.id.clone(),
             diff: self.diff.clone(),

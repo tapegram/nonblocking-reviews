@@ -47,6 +47,22 @@ impl PushRepository for MongoPushRepository {
         todo!("")
     }
 
+    async fn get_all_pushes(&self, limit: i64) -> Result<Vec<Push>, RepositoryFailure> {
+        let filter = doc! { "$match": { "summary": { "$exists": true }}};
+        let cursor = self
+            .collection
+            .find(None, None)
+            .await
+            .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
+
+        let pushes: Vec<PushRecord> = cursor
+            .try_collect()
+            .await
+            .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
+
+        Ok(pushes.iter().map(|p| p.to_push()).collect::<Vec<Push>>())
+    }
+
     async fn save(&self, push: Push) -> Result<(), RepositoryFailure> {
         let filter = doc! {"id": push.id.clone()};
         let record = to_push_record(&push);
