@@ -6,6 +6,7 @@ use review_stream_service::{
     models::Push,
     ports::push_repository::{PushRepository, RepositoryFailure},
 };
+use tracing::{error, info};
 
 use crate::{mappers::to_push_record, records::PushRecord};
 
@@ -48,11 +49,13 @@ impl PushRepository for MongoPushRepository {
     }
 
     async fn get_all_pushes(&self, limit: i64) -> Result<Vec<Push>, RepositoryFailure> {
-        let filter = doc! { "$match": { "summary": { "$exists": true }}};
+        info!("Getting all pushes");
+        let filter = doc! { "summary": { "$exists": true }};
         let options = mongodb::options::FindOptions::builder()
-            .sort(doc! { "timestamp": -1 })
+            .sort(doc! { "head_commit.timestamp": -1 })
             .limit(limit)
             .build();
+
         let cursor = self
             .collection
             .find(filter, options)
