@@ -53,11 +53,10 @@ async fn main() {
 
     let review_stream_service =
         Arc::new(ReviewStreamService::new(push_repository, octocrab.clone()));
-    let github_webhook_handler_state = GithubWebhookHandler {
-        review_stream_service: review_stream_service.clone(),
-        octocrab_client: octocrab,
-        ml_api_key: env.review_stream_config.ml_api_key,
-    };
+    let github_webhook_handler_state = GithubWebhookHandler::new(
+        review_stream_service.clone(),
+        env.openai_config.api_key.clone(),
+    );
 
     // Create WebHtmxState
     // This is how you can inject dependencies into the web-htmx crate

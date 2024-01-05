@@ -12,6 +12,7 @@ use octocrab::{
     },
     Octocrab,
 };
+use openai_api_rs::v1::api::Client;
 use review_stream_service::{
     handle_github_push::HandleGithubPushInput, service::ReviewStreamService,
 };
@@ -21,8 +22,7 @@ use tracing::{info, warn};
 async fn handle_github_webhook(
     State(GithubWebhookHandler {
         review_stream_service,
-        octocrab_client,
-        ml_api_key,
+        openaiClient,
     }): State<GithubWebhookHandler>,
     request: Request,
 ) -> () {
@@ -71,23 +71,25 @@ async fn handle_github_webhook(
                 generated_text: String,
             }
             let client = reqwest::Client::new();
-            let summary_response: Summary = client
-                .post("https://0w10jtv5s9.execute-api.us-east-1.amazonaws.com/prod/diffsummary")
-                .json(&ml_summary_json_body)
-                .header("x-api-key", ml_api_key)
-                .send()
-                .await
-                .expect("Failed to get summary of the commit")
-                .json()
-                .await
-                .expect("Failed to get body of the summary response");
+            // let summary_response: Summary = client
+            //     .post("https://0w10jtv5s9.execute-api.us-east-1.amazonaws.com/prod/diffsummary")
+            //     .json(&ml_summary_json_body)
+            //     .header("x-api-key", ml_api_key)
+            //     .send()
+            //     .await
+            //     .expect("Failed to get summary of the commit")
+            //     .json()
+            //     .await
+            //     .expect("Failed to get body of the summary response");
+            //
+            let summary_response: String = todo!();
 
             review_stream_service
                 .handle_github_push(HandleGithubPushInput {
                     github_event: *push_event,
                     repository,
                     diff,
-                    summary: summary_response.summary.generated_text,
+                    summary: summary_response,
                 })
                 .await
                 .expect("Failed to handle push webhook")
@@ -99,8 +101,16 @@ async fn handle_github_webhook(
 #[derive(Clone)]
 pub struct GithubWebhookHandler {
     pub review_stream_service: Arc<ReviewStreamService>,
-    pub octocrab_client: Octocrab,
-    pub ml_api_key: String,
+    pub openaiClient: Arc<Client>,
+}
+
+impl GithubWebhookHandler {
+    pub fn new(review_stream_service: Arc<ReviewStreamService>, openai_api_key: String) -> Self {
+        Self {
+            review_stream_service,
+            openaiClient: Arc::new(Client::new(openai_api_key)),
+        }
+    }
 }
 
 pub fn github_webhook_handler(state: GithubWebhookHandler) -> Router {
