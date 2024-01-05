@@ -31,15 +31,18 @@ fake = { version = "2.9", features = ["derive"] }
 futures = { version = "0.3.29" }
 http = { version = "1.0.0" }
 http-body-util = { version = "0.1.0" }
+jsonwebtoken = { version = "9.2.0" }
 mongodb = { version = "2.7.1" }
 nonempty = { version = "0.9.0" }
 octocrab = { version = "0.32.0" }
 once_cell = { version = "1.18.0" }
+openai-api-rs = "2.1.7"
 password-auth = { version = "1.0.0" }
 pretty_assertions = { version = "1.4.0" }
 proc-macro2 = { version = "1.0.69" }
 quote = { version = "1.0.33" }
 rand = { version = "0.8.5" }
+reqwest = { version = "0.11.23" }
 rscx = { version = "0.1.11" }
 serde = { version = "1.0.188" }
 serde_json = { version = "1.0.107" }
@@ -58,5 +61,3 @@ tracing-subscriber = { version = "0.3.17" }
 typed-builder = { version = "0.18.0" }
 uuid = { version = "1.4.1" }
 validator = { version = "0.16.1", features = ["derive"] }
-jsonwebtoken = { version = "9.2.0" }
-reqwest = { version = "0.11.23" }

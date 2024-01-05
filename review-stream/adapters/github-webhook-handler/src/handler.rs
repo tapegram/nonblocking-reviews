@@ -27,7 +27,6 @@ async fn handle_github_webhook(
     request: Request,
 ) -> () {
     print!("Received a github webhook request {:?}", request);
-    warn!("Received a github webhook request {:?}", request);
     // request_from_github is the HTTP request your webhook handler received
     let (parts, body) = request.into_parts();
     let header = parts
@@ -41,8 +40,6 @@ async fn handle_github_webhook(
     let event: WebhookEvent = WebhookEvent::try_from_header_and_body(header, &body).unwrap();
     // Now you can match on event type and call any specific handling logic
     match event.kind {
-        WebhookEventType::Ping => info!("Received a ping"),
-        WebhookEventType::PullRequest => info!("Received a pull request event"),
         WebhookEventType::Push => {
             info!("Received a push event {:?}", event);
 
@@ -83,7 +80,7 @@ async fn handle_github_webhook(
                 .expect("Failed to get summary of the commit")
                 .json()
                 .await
-                .expect("Failed to get summary of the commit");
+                .expect("Failed to get body of the summary response");
 
             review_stream_service
                 .handle_github_push(HandleGithubPushInput {
