@@ -89,6 +89,7 @@ async fn main() {
             StatusCode::BAD_REQUEST
         }))
         .layer(AuthManagerLayerBuilder::new(user_memory_store, session_layer).build());
+
     let app = app.layer(auth_layer);
     let app = app.layer(session_service);
 

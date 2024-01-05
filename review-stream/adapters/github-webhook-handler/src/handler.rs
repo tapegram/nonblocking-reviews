@@ -12,7 +12,13 @@ use octocrab::{
     },
     Octocrab,
 };
-use openai_api_rs::v1::api::Client;
+use openai_api_rs::v1::{
+    api::Client,
+    chat_completion::{
+        self, ChatCompletionMessage, ChatCompletionRequest, ChatCompletionResponse, MessageRole,
+    },
+    common::GPT3_5_TURBO,
+};
 use review_stream_service::{
     handle_github_push::HandleGithubPushInput, service::ReviewStreamService,
 };
@@ -22,7 +28,7 @@ use tracing::{info, warn};
 async fn handle_github_webhook(
     State(GithubWebhookHandler {
         review_stream_service,
-        openaiClient,
+        openai_client: openaiClient,
     }): State<GithubWebhookHandler>,
     request: Request,
 ) -> () {
@@ -59,37 +65,39 @@ async fn handle_github_webhook(
                 .await
                 .expect("Failed to get diff of the commit");
 
-            let mut ml_summary_json_body = HashMap::new();
-            ml_summary_json_body.insert("body", diff.clone());
+            let system_prompt = "You are a helpful intern summarizing code diffs into concise helpful tweets for engineers to review.\n\nPlease summarize the following diffs as a short, concise, friendly tweet with a focus on describing the primary intent of the change.\n";
+            let summary_request = ChatCompletionRequest::new(
+                GPT3_5_TURBO.to_string(),
+                vec![
+                    ChatCompletionMessage {
+                        role: MessageRole::system,
+                        content: String::from(system_prompt),
+                        name: None,
+                        function_call: None,
+                    },
+                    ChatCompletionMessage {
+                        role: MessageRole::user,
+                        content: String::from(diff.clone()),
+                        name: None,
+                        function_call: None,
+                    },
+                ],
+            );
+            let summary_completion: ChatCompletionResponse = openaiClient
+                .chat_completion(summary_request)
+                .expect("Failed to get summary of the commit");
 
-            #[derive(Serialize, Deserialize)]
-            struct Summary {
-                summary: GeneratedText,
-            }
-            #[derive(Serialize, Deserialize)]
-            struct GeneratedText {
-                generated_text: String,
-            }
-            let client = reqwest::Client::new();
-            // let summary_response: Summary = client
-            //     .post("https://0w10jtv5s9.execute-api.us-east-1.amazonaws.com/prod/diffsummary")
-            //     .json(&ml_summary_json_body)
-            //     .header("x-api-key", ml_api_key)
-            //     .send()
-            //     .await
-            //     .expect("Failed to get summary of the commit")
-            //     .json()
-            //     .await
-            //     .expect("Failed to get body of the summary response");
-            //
-            let summary_response: String = todo!();
+            info!("Summary response {:?}", summary_completion);
+
+            let choices = summary_completion.choices;
+            let summary_response = choices[0].message.content.clone().unwrap();
 
             review_stream_service
                 .handle_github_push(HandleGithubPushInput {
                     github_event: *push_event,
                     repository,
                     diff,
-                    summary: summary_response,
+                    summary: summary_response.into(),
                 })
                 .await
                 .expect("Failed to handle push webhook")
@@ -101,14 +109,14 @@ async fn handle_github_webhook(
 #[derive(Clone)]
 pub struct GithubWebhookHandler {
     pub review_stream_service: Arc<ReviewStreamService>,
-    pub openaiClient: Arc<Client>,
+    pub openai_client: Arc<Client>,
 }
 
 impl GithubWebhookHandler {
     pub fn new(review_stream_service: Arc<ReviewStreamService>, openai_api_key: String) -> Self {
         Self {
             review_stream_service,
-            openaiClient: Arc::new(Client::new(openai_api_key)),
+            openai_client: Arc::new(Client::new(openai_api_key)),
         }
     }
 }
