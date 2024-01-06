@@ -1,13 +1,12 @@
 use axum::{
-    extract::{State},
+    extract::State,
     response::{Html, IntoResponse},
-    routing::get, Router,
+    routing::get,
+    Router,
 };
 
-
-use review_stream_service::{get_feed::GetFeedInput};
+use review_stream_service::get_feed::GetFeedInput;
 use rscx::{html, CollectFragmentAsync};
-
 
 use web_client::server::{
     card::Card,
@@ -39,12 +38,25 @@ async fn get_feed(State(state): State<WebHtmxState>) -> impl IntoResponse {
         .iter()
         .map(|item| async {
             html! {
-                <GridCell>
+                <GridCell span=5>
                     <Card class="m-4 p-4">
-                        <a href={ item.link.clone() } class="text-2xl">
-                            <p class="m-2">@{ item.author.clone() }</p>
-                            <p class="m-2">{ item.summary.clone() }</p>
-                        </a>
+                            <GridLayout>
+                                <GridCell>
+                                    <a href={ item.link.clone() } class="text-lg">
+                                        <p class="m-2">{ item.summary.clone() }</p>
+                                    </a>
+                                </GridCell>
+                                <GridCell span=1>
+                                    <a href=format!("https://github.com/{}", item.author.clone()) target="_blank" rel="noopener noreferrer">
+                                        <p class="m-2 text-md">@{ item.author.clone() }</p>
+                                    </a>
+                                </GridCell>
+                                <GridCell span=2>
+                                    <a href=format!("https://github.com/{}", item.repository.clone()) target="_blank" rel="noopener noreferrer">
+                                        <p class="m-2 text-md">{ item.repository.clone() }</p>
+                                    </a>
+                                </GridCell>
+                            </GridLayout>
                     </Card>
                 </GridCell>
             }

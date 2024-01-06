@@ -75,4 +75,5 @@ pub struct Item {
     pub link: String,
     pub author: String,
     pub timestamp: DateTime<Utc>,
+    pub repository: String,
 }

@@ -38,6 +38,7 @@ fn to_feed_item(push: crate::models::Push) -> crate::models::Item {
         summary: push.summary,
         author: push.head_commit.author.username,
         link: push.compare_url,
+        repository: push.repository.full_name,
     }
 }
 
