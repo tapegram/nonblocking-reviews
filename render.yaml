@@ -1,0 +1,31 @@
+services:
+  - name: review-stream
+    type: web
+    env: rust
+    region: ohio
+    # Install bun, build client, then build rust app
+    buildCommand: |
+      curl -fsSL https://bun.sh/install | bash 
+      export BUN_INSTALL="$HOME/.bun"
+      export PATH=$BUN_INSTALL/bin:$PATH
+      ./build-client.sh
+      cargo build --release
+    startCommand: cargo run --release
+    healthCheckPath: /healthcheck
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: OUT_DIR
+        value: "out"
+          
+  - type: pserv
+    runtime: image
+    region: ohio
+    image: 
+      url: mongo:7.0.4
+    name: mongo
+    autoDeploy: true
+    disk:
+      name: data
+      mountPath: /data/db
+      sizeGB: 10
