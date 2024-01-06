@@ -36,7 +36,18 @@ pub type HandleGithubPushOutput = Result<(), HandleGithubPushFailure>;
 
 impl HandleGithubPush {
     pub async fn handle_github_push(&self, input: HandleGithubPushInput) -> HandleGithubPushOutput {
-        let summary = self.get_summary_from_openai(input.diff.clone()).await;
+        let summary = self
+            .get_summary_from_openai(
+                input.diff.clone(),
+                input
+                    .github_event
+                    .head_commit
+                    .clone()
+                    .unwrap()
+                    .message
+                    .clone(),
+            )
+            .await;
 
         let push: Push = to_push(
             &input.github_event,
@@ -57,8 +68,11 @@ impl HandleGithubPush {
      * 1 - This should be moved behind a Summarizer abstraction
      * 2 - This should return a Result.
      */
-    async fn get_summary_from_openai(&self, diff: String) -> String {
-        let system_prompt = "You are a helpful intern summarizing code diffs into concise helpful tweets for engineers to review.\n\nPlease summarize the following diffs as a short, concise, friendly tweet with a focus on describing the primary intent of the change.\n";
+    async fn get_summary_from_openai(&self, diff: String, msg: String) -> String {
+        let system_prompt = r#"
+            You are a helpful intern summarizing code diffs into concise helpful tweets for engineers to review.
+            Please summarize the following diff (with a commit message as additional context) as a short, concise, friendly tweet with a focus on describing the primary intent of the change in one or two sentences.
+        "#;
         let summary_request = ChatCompletionRequest::new(
             GPT3_5_TURBO.to_string(),
             vec![
@@ -70,7 +84,21 @@ impl HandleGithubPush {
                 },
                 ChatCompletionMessage {
                     role: MessageRole::user,
-                    content: diff.clone(),
+                    content: r#"
+                        Diff: 
+                        "#
+                    .to_owned()
+                        + &diff,
+                    name: None,
+                    function_call: None,
+                },
+                ChatCompletionMessage {
+                    role: MessageRole::user,
+                    content: r#"
+                        Commit message: 
+                        "#
+                    .to_owned()
+                        + &msg,
                     name: None,
                     function_call: None,
                 },

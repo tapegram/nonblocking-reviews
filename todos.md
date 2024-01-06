@@ -3,6 +3,10 @@
 - wrap fetching summaries in an abstraction
 - failing to fetch a summary should not panic (use Result)
 
+## View
+
+- Show repository
+
 ## Summary Refinement
 
 - Include commit messages in prompt
