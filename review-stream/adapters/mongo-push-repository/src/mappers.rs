@@ -36,7 +36,7 @@ impl CommitRecord {
             message: self.message.clone(),
             modified: self.modified.clone(),
             removed: self.removed.clone(),
-            timestamp: self.timestamp.clone(),
+            timestamp: self.timestamp,
             url: self.url.clone(),
         }
     }
@@ -89,7 +89,7 @@ pub fn to_push_record(push: &Push) -> PushRecord {
         repository: to_repository_record(&push.repository),
         pusher: to_pusher_record(&push.pusher),
         compare_url: push.compare_url.clone(),
-        commits: push.commits.iter().map(|c| to_commit_record(c)).collect(),
+        commits: push.commits.iter().map(to_commit_record).collect(),
         head_commit: to_commit_record(&push.head_commit),
         branch_ref: push.branch_ref.clone(),
         summary: push.summary.clone(),
@@ -114,7 +114,7 @@ fn to_commit_record(commit: &Commit) -> CommitRecord {
         message: commit.message.clone(),
         modified: commit.modified.clone(),
         removed: commit.removed.clone(),
-        timestamp: commit.timestamp.clone(),
+        timestamp: commit.timestamp,
         url: commit.url.clone(),
     }
 }

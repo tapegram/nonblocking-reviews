@@ -1,12 +1,12 @@
 use async_trait::async_trait;
-use chrono::{serde::ts_seconds, DateTime, Utc};
+
 use futures::TryStreamExt;
 use mongodb::bson::doc;
 use review_stream_service::{
     models::Push,
     ports::push_repository::{PushRepository, RepositoryFailure},
 };
-use tracing::{error, info};
+use tracing::{info};
 
 use crate::{mappers::to_push_record, records::PushRecord};
 
@@ -36,7 +36,7 @@ impl MongoPushRepository {
 
 #[async_trait]
 impl PushRepository for MongoPushRepository {
-    async fn get_push(&self, id: String) -> Result<Option<Push>, RepositoryFailure> {
+    async fn get_push(&self, _id: String) -> Result<Option<Push>, RepositoryFailure> {
         // let filter = doc! { "id": id };
         // let maybe_worksite = self
         //     .collection

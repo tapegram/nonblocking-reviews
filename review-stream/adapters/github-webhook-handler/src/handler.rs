@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{sync::Arc};
 
 use axum::{
     extract::{Request, State},
@@ -10,19 +10,18 @@ use octocrab::{
     models::webhook_events::{
         payload::PushWebhookEventPayload, WebhookEvent, WebhookEventPayload, WebhookEventType,
     },
-    Octocrab,
 };
 use openai_api_rs::v1::{
     api::Client,
     chat_completion::{
-        self, ChatCompletionMessage, ChatCompletionRequest, ChatCompletionResponse, MessageRole,
+        ChatCompletionMessage, ChatCompletionRequest, ChatCompletionResponse, MessageRole,
     },
     common::GPT3_5_TURBO,
 };
 use review_stream_service::{
     handle_github_push::HandleGithubPushInput, service::ReviewStreamService,
 };
-use serde::{Deserialize, Serialize};
+
 use tracing::{info, warn};
 
 async fn handle_github_webhook(
@@ -31,7 +30,7 @@ async fn handle_github_webhook(
         openai_client: openaiClient,
     }): State<GithubWebhookHandler>,
     request: Request,
-) -> () {
+) {
     print!("Received a github webhook request {:?}", request);
     // request_from_github is the HTTP request your webhook handler received
     let (parts, body) = request.into_parts();
@@ -77,7 +76,7 @@ async fn handle_github_webhook(
                     },
                     ChatCompletionMessage {
                         role: MessageRole::user,
-                        content: String::from(diff.clone()),
+                        content: diff.clone(),
                         name: None,
                         function_call: None,
                     },
@@ -97,7 +96,7 @@ async fn handle_github_webhook(
                     github_event: *push_event,
                     repository,
                     diff,
-                    summary: summary_response.into(),
+                    summary: summary_response,
                 })
                 .await
                 .expect("Failed to handle push webhook")

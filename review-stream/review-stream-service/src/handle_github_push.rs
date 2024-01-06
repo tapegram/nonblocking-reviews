@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use octocrab::models::webhook_events::{
     payload::{PushWebhookEventCommit, PushWebhookEventPayload},
-    WebhookEvent, WebhookEventPayload,
 };
 use thiserror::Error;
 
@@ -69,7 +68,7 @@ fn to_push(
         commits: payload
             .commits
             .iter()
-            .map(|c| to_commit(c))
+            .map(to_commit)
             .collect::<Vec<_>>(),
         head_commit: to_commit(&payload.head_commit.clone().unwrap()),
         summary: summary.clone(),

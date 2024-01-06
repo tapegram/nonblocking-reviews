@@ -27,7 +27,7 @@ impl GetFeed {
             .await
             .map_err(|e| GetFeedFailure::Unknown(e.to_string()))?;
 
-        let items = pushes.into_iter().map(|p| to_feed_item(p)).collect();
+        let items = pushes.into_iter().map(to_feed_item).collect();
         Ok(Feed { items })
     }
 }
