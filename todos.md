@@ -9,8 +9,6 @@
 
 ## Summary Refinement
 
-- Include commit messages in prompt
-- Tweak prompt for shorter responses
 
 ## Infrastructure
 
