@@ -1,6 +1,5 @@
 ## Cleanup and deploy
 
-- deploy application
 - wrap fetching summaries in an abstraction
 - failing to fetch a summary should not panic (use Result)
 
