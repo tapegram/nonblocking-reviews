@@ -1974,6 +1974,7 @@ dependencies = [
  "chrono",
  "http-body-util",
  "octocrab",
+ "openai-api-rs",
  "thiserror",
  "tokio",
  "tracing",

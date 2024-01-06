@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use octocrab::Octocrab;
+use openai_api_rs::v1::api::Client;
 
 use crate::{
     get_feed::{GetFeed, GetFeedInput, GetFeedOutput},
@@ -16,7 +16,8 @@ pub struct ReviewStreamService {
 }
 
 impl ReviewStreamService {
-    pub fn new(push_repository: Arc<dyn PushRepository>, octocrab_client: Octocrab) -> Self {
+    pub fn new(push_repository: Arc<dyn PushRepository>, openai_api_key: String) -> Self {
+        let openai_client = Arc::new(Client::new(openai_api_key));
         Self {
             //##PLOP INSERT COMMAND INSTANTIATION HOOK##
             get_feed: GetFeed {
@@ -24,7 +25,7 @@ impl ReviewStreamService {
             },
             handle_github_push: HandleGithubPush {
                 push_repository: push_repository.clone(),
-                octocrab_client: octocrab_client.clone(),
+                openai_client,
             },
         }
     }

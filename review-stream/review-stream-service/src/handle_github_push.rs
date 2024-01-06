@@ -1,20 +1,18 @@
 use std::sync::Arc;
 
-use octocrab::models::webhook_events::{
-    payload::{PushWebhookEventCommit, PushWebhookEventPayload},
-};
+use octocrab::models::webhook_events::payload::{PushWebhookEventCommit, PushWebhookEventPayload};
+use openai_api_rs::v1::api::Client;
 use thiserror::Error;
 
 use crate::{
     models::{Author, Commit, Committer, Push, Pusher, Repository},
     ports::push_repository::PushRepository,
 };
-use http_body_util::BodyExt;
 
 #[derive(Clone)]
 pub struct HandleGithubPush {
     pub push_repository: Arc<dyn PushRepository>,
-    pub octocrab_client: octocrab::Octocrab,
+    pub openai_client: Arc<Client>,
 }
 
 #[derive(Clone, Debug)]
@@ -65,11 +63,7 @@ fn to_push(
             email: payload.pusher.user.email.clone(),
         },
         compare_url: payload.compare.clone().to_string(),
-        commits: payload
-            .commits
-            .iter()
-            .map(to_commit)
-            .collect::<Vec<_>>(),
+        commits: payload.commits.iter().map(to_commit).collect::<Vec<_>>(),
         head_commit: to_commit(&payload.head_commit.clone().unwrap()),
         summary: summary.clone(),
     }

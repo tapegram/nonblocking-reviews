@@ -8,7 +8,6 @@ use axum_login::{tower_sessions::SessionManagerLayer, AuthManagerLayerBuilder};
 use environment::load_environment;
 use github_webhook_handler::handler::{github_webhook_handler, GithubWebhookHandler};
 use mongo_push_repository::mongo_push_repository::MongoPushRepository;
-use octocrab::Octocrab;
 use review_stream_service::service::ReviewStreamService;
 use std::{net::SocketAddr, sync::Arc};
 use tower::ServiceBuilder;
@@ -28,21 +27,21 @@ async fn main() {
     let env = load_environment();
 
     // Github client
-    let app_id = env
-        .github_app_config
-        .app_id
-        .parse::<u64>()
-        .expect("Failed to parse Github App ID")
-        .into();
-    let app_private_key_path = env.github_app_config.private_key_path;
-    let app_private_key =
-        std::fs::read_to_string(app_private_key_path).expect("Failed to read private key pem file");
-    let key = jsonwebtoken::EncodingKey::from_rsa_pem(app_private_key.as_bytes())
-        .expect("Failed to generate JWT from pem");
-    let octocrab = Octocrab::builder()
-        .app(app_id, key)
-        .build()
-        .expect("Could not init github client");
+    // let app_id = env
+    //     .github_app_config
+    //     .app_id
+    //     .parse::<u64>()
+    //     .expect("Failed to parse Github App ID")
+    //     .into();
+    // let app_private_key_path = env.github_app_config.private_key_path;
+    // let app_private_key =
+    //     std::fs::read_to_string(app_private_key_path).expect("Failed to read private key pem file");
+    // let key = jsonwebtoken::EncodingKey::from_rsa_pem(app_private_key.as_bytes())
+    //     .expect("Failed to generate JWT from pem");
+    // let octocrab = Octocrab::builder()
+    //     .app(app_id, key)
+    //     .build()
+    //     .expect("Could not init github client");
 
     // Create review stream service
     let push_repository = Arc::new(
@@ -51,8 +50,11 @@ async fn main() {
             .expect("Could not create push repository"),
     );
 
-    let review_stream_service =
-        Arc::new(ReviewStreamService::new(push_repository, octocrab.clone()));
+    let review_stream_service = Arc::new(ReviewStreamService::new(
+        push_repository,
+        env.openai_config.api_key.clone(),
+    ));
+
     let github_webhook_handler_state = GithubWebhookHandler::new(
         review_stream_service.clone(),
         env.openai_config.api_key.clone(),

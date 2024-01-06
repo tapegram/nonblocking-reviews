@@ -1,4 +1,4 @@
-use std::{sync::Arc};
+use std::sync::Arc;
 
 use axum::{
     extract::{Request, State},
@@ -6,10 +6,8 @@ use axum::{
     Router,
 };
 use http_body_util::BodyExt;
-use octocrab::{
-    models::webhook_events::{
-        payload::PushWebhookEventPayload, WebhookEvent, WebhookEventPayload, WebhookEventType,
-    },
+use octocrab::models::webhook_events::{
+    payload::PushWebhookEventPayload, WebhookEvent, WebhookEventPayload, WebhookEventType,
 };
 use openai_api_rs::v1::{
     api::Client,
@@ -27,7 +25,7 @@ use tracing::{info, warn};
 async fn handle_github_webhook(
     State(GithubWebhookHandler {
         review_stream_service,
-        openai_client: openaiClient,
+        openai_client,
     }): State<GithubWebhookHandler>,
     request: Request,
 ) {
@@ -82,7 +80,7 @@ async fn handle_github_webhook(
                     },
                 ],
             );
-            let summary_completion: ChatCompletionResponse = openaiClient
+            let summary_completion: ChatCompletionResponse = openai_client
                 .chat_completion(summary_request)
                 .expect("Failed to get summary of the commit");
 

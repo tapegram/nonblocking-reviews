@@ -6,10 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-http-body-util = { workspace = true }
-chrono = { workspace = true }
+
 async-trait = { workspace = true }
+chrono = { workspace = true }
+http-body-util = { workspace = true }
 octocrab = { workspace = true }                   # Should this be kept in the adapter?
+openai-api-rs = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
