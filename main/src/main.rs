@@ -26,23 +26,6 @@ async fn main() {
 
     let env = load_environment();
 
-    // Github client
-    // let app_id = env
-    //     .github_app_config
-    //     .app_id
-    //     .parse::<u64>()
-    //     .expect("Failed to parse Github App ID")
-    //     .into();
-    // let app_private_key_path = env.github_app_config.private_key_path;
-    // let app_private_key =
-    //     std::fs::read_to_string(app_private_key_path).expect("Failed to read private key pem file");
-    // let key = jsonwebtoken::EncodingKey::from_rsa_pem(app_private_key.as_bytes())
-    //     .expect("Failed to generate JWT from pem");
-    // let octocrab = Octocrab::builder()
-    //     .app(app_id, key)
-    //     .build()
-    //     .expect("Could not init github client");
-
     // Create review stream service
     let push_repository = Arc::new(
         MongoPushRepository::new(&env.review_stream_config.mongo_url)
@@ -55,15 +38,9 @@ async fn main() {
         env.openai_config.api_key.clone(),
     ));
 
-    let github_webhook_handler_state = GithubWebhookHandler::new(
-        review_stream_service.clone(),
-        env.openai_config.api_key.clone(),
-    );
+    let github_webhook_handler_state = GithubWebhookHandler::new(review_stream_service.clone());
 
     // Create WebHtmxState
-    // This is how you can inject dependencies into the web-htmx crate
-    // like a backend service
-    // TODO: include an example
     let web_htmx_state = WebHtmxState {
         flash_config: axum_flash::Config::new(axum_flash::Key::generate()),
         review_feed_service: review_stream_service,

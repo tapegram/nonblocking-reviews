@@ -9,13 +9,6 @@ use http_body_util::BodyExt;
 use octocrab::models::webhook_events::{
     payload::PushWebhookEventPayload, WebhookEvent, WebhookEventPayload, WebhookEventType,
 };
-use openai_api_rs::v1::{
-    api::Client,
-    chat_completion::{
-        ChatCompletionMessage, ChatCompletionRequest, ChatCompletionResponse, MessageRole,
-    },
-    common::GPT3_5_TURBO,
-};
 use review_stream_service::{
     handle_github_push::HandleGithubPushInput, service::ReviewStreamService,
 };
@@ -25,7 +18,6 @@ use tracing::{info, warn};
 async fn handle_github_webhook(
     State(GithubWebhookHandler {
         review_stream_service,
-        openai_client,
     }): State<GithubWebhookHandler>,
     request: Request,
 ) {
@@ -62,39 +54,11 @@ async fn handle_github_webhook(
                 .await
                 .expect("Failed to get diff of the commit");
 
-            let system_prompt = "You are a helpful intern summarizing code diffs into concise helpful tweets for engineers to review.\n\nPlease summarize the following diffs as a short, concise, friendly tweet with a focus on describing the primary intent of the change.\n";
-            let summary_request = ChatCompletionRequest::new(
-                GPT3_5_TURBO.to_string(),
-                vec![
-                    ChatCompletionMessage {
-                        role: MessageRole::system,
-                        content: String::from(system_prompt),
-                        name: None,
-                        function_call: None,
-                    },
-                    ChatCompletionMessage {
-                        role: MessageRole::user,
-                        content: diff.clone(),
-                        name: None,
-                        function_call: None,
-                    },
-                ],
-            );
-            let summary_completion: ChatCompletionResponse = openai_client
-                .chat_completion(summary_request)
-                .expect("Failed to get summary of the commit");
-
-            info!("Summary response {:?}", summary_completion);
-
-            let choices = summary_completion.choices;
-            let summary_response = choices[0].message.content.clone().unwrap();
-
             review_stream_service
                 .handle_github_push(HandleGithubPushInput {
                     github_event: *push_event,
                     repository,
                     diff,
-                    summary: summary_response,
                 })
                 .await
                 .expect("Failed to handle push webhook")
@@ -106,14 +70,12 @@ async fn handle_github_webhook(
 #[derive(Clone)]
 pub struct GithubWebhookHandler {
     pub review_stream_service: Arc<ReviewStreamService>,
-    pub openai_client: Arc<Client>,
 }
 
 impl GithubWebhookHandler {
-    pub fn new(review_stream_service: Arc<ReviewStreamService>, openai_api_key: String) -> Self {
+    pub fn new(review_stream_service: Arc<ReviewStreamService>) -> Self {
         Self {
             review_stream_service,
-            openai_client: Arc::new(Client::new(openai_api_key)),
         }
     }
 }

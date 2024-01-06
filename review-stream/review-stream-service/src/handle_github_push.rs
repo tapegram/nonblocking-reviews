@@ -1,8 +1,15 @@
 use std::sync::Arc;
 
 use octocrab::models::webhook_events::payload::{PushWebhookEventCommit, PushWebhookEventPayload};
-use openai_api_rs::v1::api::Client;
+use openai_api_rs::v1::{
+    api::Client,
+    chat_completion::{
+        ChatCompletionMessage, ChatCompletionRequest, ChatCompletionResponse, MessageRole,
+    },
+    common::GPT3_5_TURBO,
+};
 use thiserror::Error;
+use tracing::info;
 
 use crate::{
     models::{Author, Commit, Committer, Push, Pusher, Repository},
@@ -22,8 +29,6 @@ pub struct HandleGithubPushInput {
     pub repository: octocrab::models::Repository,
     // Fetched from github commit api
     pub diff: String,
-    // Fetched from our ML service
-    pub summary: String,
 }
 
 // Change the return type, if needed
@@ -31,11 +36,13 @@ pub type HandleGithubPushOutput = Result<(), HandleGithubPushFailure>;
 
 impl HandleGithubPush {
     pub async fn handle_github_push(&self, input: HandleGithubPushInput) -> HandleGithubPushOutput {
+        let summary = self.get_summary_from_openai(input.diff.clone()).await;
+
         let push: Push = to_push(
             &input.github_event,
             &input.repository,
             &input.diff,
-            &input.summary,
+            &summary,
         );
 
         self.push_repository
@@ -44,6 +51,42 @@ impl HandleGithubPush {
             .map_err(|e| HandleGithubPushFailure::Unknown(e.to_string()))?;
 
         Ok(())
+    }
+
+    /**
+     * 1 - This should be moved behind a Summarizer abstraction
+     * 2 - This should return a Result.
+     */
+    async fn get_summary_from_openai(&self, diff: String) -> String {
+        let system_prompt = "You are a helpful intern summarizing code diffs into concise helpful tweets for engineers to review.\n\nPlease summarize the following diffs as a short, concise, friendly tweet with a focus on describing the primary intent of the change.\n";
+        let summary_request = ChatCompletionRequest::new(
+            GPT3_5_TURBO.to_string(),
+            vec![
+                ChatCompletionMessage {
+                    role: MessageRole::system,
+                    content: String::from(system_prompt),
+                    name: None,
+                    function_call: None,
+                },
+                ChatCompletionMessage {
+                    role: MessageRole::user,
+                    content: diff.clone(),
+                    name: None,
+                    function_call: None,
+                },
+            ],
+        );
+        let summary_completion: ChatCompletionResponse = self
+            .openai_client
+            .chat_completion(summary_request)
+            .expect("Failed to get summary of the commit");
+
+        info!("Summary response {:?}", summary_completion);
+
+        let choices = summary_completion.choices;
+        let summary_response = choices[0].message.content.clone().unwrap();
+
+        summary_response
     }
 }
 
