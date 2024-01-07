@@ -28,7 +28,7 @@ impl GetUserForLogin {
             .map_err(|e| GetUserForLoginFailure::Internal(e.to_string()))?;
 
         match user {
-            Some(user) => verify_password(input.password, &user.hashed_password)
+            Some(user) => verify_password(input.password, &user.access_token)
                 .map(|_| user)
                 .map_err(|_| GetUserForLoginFailure::WrongPassword),
             None => Err(GetUserForLoginFailure::UserNotFound),

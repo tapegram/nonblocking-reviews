@@ -35,12 +35,12 @@ impl CreateUser {
             })?;
 
         // Salt and hash the pw
-        let hashed_password = generate_hash(input.password);
+        let access_token = generate_hash(input.password);
 
         let new_user = User {
             id: uuid::Uuid::new_v4().to_string(),
             email: input.email,
-            hashed_password,
+            access_token,
             role: UserRole::new(&input.role)
                 .ok_or(CreateUserFailure::InvalidUserRole(input.role))?,
         };

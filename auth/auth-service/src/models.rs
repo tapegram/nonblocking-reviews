@@ -1,20 +1,33 @@
 use axum_login::AuthUser;
 use std::fmt::Display;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct User {
     pub id: String,
     pub email: String,
-    pub hashed_password: String,
+    pub access_token: String,
     pub role: UserRole,
+}
+//
+// Here we've implemented `Debug` manually to avoid accidentally logging the
+// access token.
+impl std::fmt::Debug for User {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("User")
+            .field("id", &self.id)
+            .field("email", &self.email)
+            .field("access_token", &"[redacted]")
+            .field("role", &self.role)
+            .finish()
+    }
 }
 
 impl User {
-    pub fn new(email: String, hashed_password: String) -> Self {
+    pub fn new(email: String, access_token: String) -> Self {
         Self {
             id: uuid::Uuid::new_v4().to_string(),
             email,
-            hashed_password,
+            access_token,
             role: UserRole::Organizer,
         }
     }
@@ -22,7 +35,7 @@ impl User {
         Self {
             id: self.id.clone(),
             email,
-            hashed_password: self.hashed_password.clone(),
+            access_token: self.access_token.clone(),
             role,
         }
     }
@@ -42,7 +55,7 @@ impl AuthUser for User {
     }
 
     fn session_auth_hash(&self) -> &[u8] {
-        self.hashed_password.as_bytes()
+        self.access_token.as_bytes()
     }
 }
 
@@ -64,24 +77,8 @@ impl UserRole {
     }
     pub fn has_perm(&self, permission: UserPermission) -> bool {
         match self {
-            Self::Organizer => match permission {
-                UserPermission::CreateUser => false,
-                UserPermission::ReadUser => false,
-                UserPermission::UpdateUser => false,
-                UserPermission::DeleteUser => false,
-                UserPermission::DeleteAssignedWorker => false,
-                UserPermission::DeleteTag => false,
-                UserPermission::DeleteAssessment => false,
-            },
-            Self::Admin => match permission {
-                UserPermission::CreateUser => false,
-                UserPermission::ReadUser => false,
-                UserPermission::UpdateUser => false,
-                UserPermission::DeleteUser => false,
-                UserPermission::DeleteAssignedWorker => true,
-                UserPermission::DeleteTag => true,
-                UserPermission::DeleteAssessment => true,
-            },
+            Self::Organizer => match permission {},
+            Self::Admin => match permission {},
             Self::SuperAdmin => true,
         }
     }
@@ -99,26 +96,11 @@ impl Display for UserRole {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub enum UserPermission {
-    CreateUser,
-    ReadUser,
-    UpdateUser,
-    DeleteUser,
-    DeleteAssignedWorker,
-    DeleteTag,
-    DeleteAssessment,
-}
+pub enum UserPermission {}
 
 impl From<&str> for UserPermission {
     fn from(permission: &str) -> Self {
         match permission {
-            "user.create" => Self::CreateUser,
-            "user.read" => Self::ReadUser,
-            "user.update" => Self::UpdateUser,
-            "user.delete" => Self::DeleteUser,
-            "assigned_worker.delete" => Self::DeleteAssignedWorker,
-            "tag.delete" => Self::DeleteTag,
-            "assessment.delete" => Self::DeleteAssessment,
             _ => panic!("Permission does not exist"),
         }
     }

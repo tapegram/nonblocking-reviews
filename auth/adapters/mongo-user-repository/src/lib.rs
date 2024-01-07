@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use axum_login::axum::http::header::{AUTHORIZATION, USER_AGENT};
 use axum_login::{AuthnBackend, AuthzBackend, UserId};
 use futures::stream::TryStreamExt;
 use mongodb::bson::doc;
@@ -8,12 +9,25 @@ use std::sync::Arc;
 use auth_service::models::{User, UserPermission, UserRole};
 use auth_service::ports::user_repository::{RepositoryFailure, UserRepository};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 struct UserRecord {
     pub id: String,
     pub email: String,
-    pub hashed_password: String,
+    pub access_token: String,
     pub role: String,
+}
+
+// Here we've implemented `Debug` manually to avoid accidentally logging the
+// access token.
+impl std::fmt::Debug for UserRecord {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("UserRecord")
+            .field("id", &self.id)
+            .field("email", &self.email)
+            .field("access_token", &"[redacted]")
+            .field("role", &self.role)
+            .finish()
+    }
 }
 
 impl UserRecord {
@@ -21,7 +35,7 @@ impl UserRecord {
         Ok(User {
             id: self.id.clone(),
             email: self.email.clone(),
-            hashed_password: self.hashed_password.clone(),
+            access_token: self.access_token.clone(),
             role: UserRole::new(self.role.clone()).ok_or(RepositoryFailure::UnknownUserRole)?,
         })
     }
@@ -31,7 +45,7 @@ fn to_user_record(user: &User) -> UserRecord {
     UserRecord {
         id: user.id.clone(),
         email: user.email.clone(),
-        hashed_password: user.hashed_password.clone(),
+        access_token: user.access_token.clone(),
         role: user.role.to_string(),
     }
 }
@@ -140,9 +154,7 @@ pub struct MongoUserStore {
 
 #[derive(Clone)]
 pub struct Credentials {
-    pub user_id: String,
-    // Used to help redirect the user to the page they were trying to access
-    pub next: Option<String>,
+    pub access_code: String,
 }
 
 /**
@@ -156,9 +168,41 @@ impl AuthnBackend for MongoUserStore {
 
     async fn authenticate(
         &self,
-        Credentials { user_id, .. }: Self::Credentials,
+        Credentials { access_code }: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
-        self.get_user(&user_id).await
+        // self.get_user(&user_id).await
+        #[derive(Debug, Deserialize)]
+        struct UserInfo {
+            login: String,
+        }
+        let user_info = reqwest::Client::new()
+            .get("https://api.github.com/user")
+            .header(USER_AGENT.as_str(), "Code-Feed-App") // See: https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
+            .header(AUTHORIZATION.as_str(), format!("Bearer {}", access_code))
+            .send()
+            .await
+            .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?
+            .json::<UserInfo>()
+            .await
+            .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
+
+        let user = self.users.find_by_email(user_info.login.clone()).await?;
+
+        match user {
+            Some(user) => {
+                let updated_user = User {
+                    access_token: access_code,
+                    ..user
+                };
+                self.users.save(updated_user.clone()).await?;
+                Ok(Some(updated_user))
+            }
+            None => {
+                let new_user = User::new(user_info.login, access_code);
+                self.users.save(new_user.clone()).await?;
+                Ok(Some(new_user))
+            }
+        }
     }
 
     async fn get_user(&self, user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {
@@ -300,7 +344,7 @@ mod tests {
 
         let user = auth_service::models::User {
             // New password
-            hashed_password: Password(std::ops::Range { start: 10, end: 20 }).fake::<String>(),
+            access_token: Password(std::ops::Range { start: 10, end: 20 }).fake::<String>(),
             ..user.clone()
         };
 

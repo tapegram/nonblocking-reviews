@@ -13,7 +13,7 @@ use axum_login::{AuthUser, AuthnBackend, UserId};
 #[derive(Debug, Clone)]
 pub struct User {
     id: i64,
-    pw_hash: Vec<u8>,
+    access_token: String,
 }
 
 impl AuthUser for User {
@@ -24,7 +24,7 @@ impl AuthUser for User {
     }
 
     fn session_auth_hash(&self) -> &[u8] {
-        &self.pw_hash
+        &self.access_token.as_bytes()
     }
 }
 
