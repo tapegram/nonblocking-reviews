@@ -99,9 +99,7 @@ impl Display for UserRole {
 pub enum UserPermission {}
 
 impl From<&str> for UserPermission {
-    fn from(permission: &str) -> Self {
-        match permission {
-            _ => panic!("Permission does not exist"),
-        }
+    fn from(_permission: &str) -> Self {
+        panic!("Permission does not exist")
     }
 }
