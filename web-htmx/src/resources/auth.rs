@@ -1,12 +1,8 @@
-
 use crate::state::WebHtmxState;
 use crate::{components::page::PageLayout, routes};
 use axum::extract::Query;
-use axum::{
-    response::{Html, IntoResponse},
-    routing::{get}, Router,
-};
-
+use axum::response::{Html, IntoResponse};
+use axum::{routing::get, Router};
 
 use rscx::{component, html, props};
 use serde::Deserialize;
@@ -24,13 +20,6 @@ async fn get_login(Query(NextUrl { next }): Query<NextUrl>) -> impl IntoResponse
             <LoginForm login_route=routes::login() next=next/>
         </PageLayout>
     })
-}
-
-#[derive(Deserialize, Debug)]
-struct LoginForm {
-    email: String,
-    password: String,
-    next: Option<String>,
 }
 
 // This allows us to extract the "next" field from the query string. We use this
@@ -83,12 +72,4 @@ fn LoginForm(props: LoginFormProps) -> String {
             }
         </form>
     }
-}
-
-async fn get_forbidden() -> impl IntoResponse {
-    Html(html! {
-        <PageLayout header="Access Denied">
-            <p>"You are not authorized to view this page"</p>
-        </PageLayout>
-    })
 }
