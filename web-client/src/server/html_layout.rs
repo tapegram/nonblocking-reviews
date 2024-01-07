@@ -13,7 +13,7 @@ static TS: Lazy<u128> = Lazy::new(|| {
 
 #[props]
 pub struct HtmlLayoutProps {
-    #[builder(setter(into), default = "Yall Chart".to_string())]
+    #[builder(setter(into), default = "Review Feed".to_string())]
     head_title: String,
 
     #[builder(default)]
