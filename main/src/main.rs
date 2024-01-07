@@ -1,4 +1,3 @@
-use auth::Backend;
 use axum::{
     error_handling::HandleErrorLayer, http::StatusCode, response::IntoResponse, routing::get,
     BoxError, Router,
@@ -8,6 +7,7 @@ use axum_login::{tower_sessions::SessionManagerLayer, AuthManagerLayerBuilder};
 use environment::load_environment;
 use github_webhook_handler::handler::{github_webhook_handler, GithubWebhookHandler};
 use mongo_push_repository::mongo_push_repository::MongoPushRepository;
+use mongo_user_repository::{MongoUserRepository, MongoUserStore};
 use review_stream_service::service::ReviewStreamService;
 use std::{net::SocketAddr, sync::Arc};
 use tower::ServiceBuilder;
@@ -15,7 +15,6 @@ use tower::ServiceBuilder;
 use tower_sessions::{cookie::time::Duration, Expiry, MemoryStore};
 use web_htmx::{livereload, routes as web_routes, state::WebHtmxState};
 
-mod auth;
 mod environment;
 
 #[tokio::main]
@@ -63,7 +62,16 @@ async fn main() {
         }))
         .layer(SessionManagerLayer::new(session_store.clone()).with_secure(false));
 
-    let user_memory_store = Backend::default();
+    let user_repository = Arc::new(
+        MongoUserRepository::new(&env.review_stream_config.mongo_url)
+            .await
+            .expect("Could not create push repository"),
+    );
+
+    let user_memory_store = MongoUserStore {
+        users: user_repository.clone(),
+    };
+
     let session_layer = SessionManagerLayer::new(session_store)
         .with_secure(false)
         .with_expiry(Expiry::OnInactivity(Duration::hours(1)));
