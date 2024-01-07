@@ -112,9 +112,9 @@ impl HandleGithubPush {
         info!("Summary response {:?}", summary_completion);
 
         let choices = summary_completion.choices;
-        let summary_response = choices[0].message.content.clone().unwrap();
+        
 
-        summary_response
+        choices[0].message.content.clone().unwrap()
     }
 }
 
