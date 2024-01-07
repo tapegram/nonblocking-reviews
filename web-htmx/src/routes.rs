@@ -38,6 +38,11 @@ pub fn login() -> String {
     LOGIN.into()
 }
 
+pub const GITHUB_AUTH_CALLBACK: &str = "/github-auth-callback";
+pub fn github_auth_callback() -> String {
+    GITHUB_AUTH_CALLBACK.into()
+}
+
 pub const FEED: &str = "/feed";
 pub fn feed() -> String {
     FEED.into()

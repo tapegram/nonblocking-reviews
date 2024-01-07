@@ -7,20 +7,21 @@ edition = "2021"
 
 [dependencies]
 axum = { workspace = true, features = ["multipart"] }
+axum-extra = { workspace = true }
 axum-flash = { workspace = true }
 axum-login = { workspace = true }
-axum-extra = { workspace = true }
 axum-macros = { workspace = true }
 chrono = { workspace = true }
+futures = { workspace = true }
 http = { workspace = true }
 once_cell = { workspace = true }
+reqwest = { workspace = true }
+review-stream-service = { path = "../review-stream/review-stream-service" }
 rscx = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tower-livereload = { workspace = true }
+validator = { workspace = true }
 web-client = { path = "../web-client" }
 web-macros = { path = "../web-macros" }
-futures = { workspace = true }
-validator = { workspace = true }
-review-stream-service = { path = "../review-stream/review-stream-service" }

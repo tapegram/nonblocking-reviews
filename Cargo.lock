@@ -3324,6 +3324,7 @@ dependencies = [
  "futures",
  "http 1.0.0",
  "once_cell",
+ "reqwest",
  "review-stream-service",
  "rscx",
  "serde",
