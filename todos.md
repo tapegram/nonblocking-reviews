@@ -1,14 +1,14 @@
-## Cleanup and deploy
+## Cleanup
 
 - wrap fetching summaries in an abstraction
 - failing to fetch a summary should not panic (use Result)
 
 ## View
 
-- Show repository
-
 ## Summary Refinement
 
+- Can we get rid of any prefaces like "this diff..."
+- It seems confused about diffs to documentation
 
 ## Infrastructure
 
@@ -17,7 +17,7 @@
 
 ## Personalization
 
-- Auth
+- Loging in with Github OAuth locally. Next step is setting up login form
 - Hard coded rules about who might be interested in what
 - Discovery work with openai tooling
 
