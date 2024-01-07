@@ -3420,6 +3420,7 @@ dependencies = [
  "serde_json",
  "tokio",
  "tower-livereload",
+ "tracing",
  "validator",
  "web-client",
  "web-macros",

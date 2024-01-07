@@ -11,6 +11,7 @@ use http::StatusCode;
 use mongo_user_repository::{Credentials, MongoUserStore};
 use rscx::{component, html, props};
 use serde::Deserialize;
+use tracing::info;
 
 pub fn auth_routes(state: WebHtmxState) -> Router {
     Router::new()
@@ -20,26 +21,13 @@ pub fn auth_routes(state: WebHtmxState) -> Router {
 }
 
 async fn get_login(State(state): State<WebHtmxState>) -> impl IntoResponse {
-    Html(html! {
-        <PageLayout header="Login">
-            <LoginForm github_client_id=state.github_auth_config.client_id />
-        </PageLayout>
-    })
-}
-
-#[props]
-struct LoginFormProps {
-    #[builder(setter(into))]
-    github_client_id: String,
-}
-
-#[component]
-fn LoginForm(props: LoginFormProps) -> String {
-    html! {
-        <a href=format!("https://github.com/login/oauth/authorize?scope=user:email&client_id={}", props.github_client_id)>
-          Login with Github
-        </a>
-    }
+    Redirect::to(
+        format!(
+            "https://github.com/login/oauth/authorize?scope=user:email&client_id={}",
+            state.github_auth_config.client_id,
+        )
+        .as_str(),
+    )
 }
 
 #[derive(Deserialize)]
@@ -48,13 +36,13 @@ struct GithubAuthCallbackQueryParams {
 }
 async fn get_github_auth_callback(
     State(WebHtmxState {
-        auth_service,
-        github_auth_config,
-        ..
+        github_auth_config, ..
     }): State<WebHtmxState>,
     mut auth: AuthSession<MongoUserStore>,
     Query(query_params): Query<GithubAuthCallbackQueryParams>,
 ) -> impl IntoResponse {
+    info!("Github auth callback");
+
     let client = reqwest::Client::new();
     let params = &[
         ("client_id", github_auth_config.client_id.clone()),
@@ -71,6 +59,8 @@ async fn get_github_auth_callback(
         .send()
         .await
         .expect("Failed to validate with github");
+
+    info!("Got token from github");
 
     #[derive(Deserialize, Debug)]
     struct GithubAccessTokenResponse {
@@ -107,6 +97,8 @@ async fn get_github_auth_callback(
         )
             .into_response();
     }
+
+    info!("Logged in!");
 
     Redirect::to(routes::HOME).into_response()
 }

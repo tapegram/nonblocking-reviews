@@ -13,7 +13,11 @@ use review_stream_service::service::ReviewStreamService;
 use std::{net::SocketAddr, sync::Arc};
 use tower::ServiceBuilder;
 
-use tower_sessions::{cookie::time::Duration, Expiry, MemoryStore};
+use tower_sessions::{
+    cookie::{time::Duration, SameSite},
+    mongodb::Client,
+    Expiry, MemoryStore, MongoDBStore,
+};
 use web_htmx::{livereload, routes as web_routes, state::WebHtmxState};
 
 mod environment;
@@ -65,7 +69,10 @@ async fn main() {
         .route("/healthcheck", get(get_health_check));
 
     // Auth and session setup
-    let session_store = MemoryStore::default();
+    let client = Client::with_uri_str(&env.review_stream_config.mongo_url)
+        .await
+        .expect("Failed to create mongo client");
+    let session_store = MongoDBStore::new(client, "sessions".to_string());
     let session_service = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(|_: BoxError| async {
             StatusCode::BAD_REQUEST
@@ -78,7 +85,9 @@ async fn main() {
 
     let session_layer = SessionManagerLayer::new(session_store)
         .with_secure(false)
+        .with_same_site(SameSite::Lax) // Ensure we send the cookie from the OAuth redirect.
         .with_expiry(Expiry::OnInactivity(Duration::hours(1)));
+
     let auth_layer = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(|_: BoxError| async {
             StatusCode::BAD_REQUEST
