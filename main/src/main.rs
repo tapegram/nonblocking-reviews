@@ -1,3 +1,4 @@
+use auth_service::service::AuthService;
 use axum::{
     error_handling::HandleErrorLayer, http::StatusCode, response::IntoResponse, routing::get,
     BoxError, Router,
@@ -39,10 +40,19 @@ async fn main() {
 
     let github_webhook_handler_state = GithubWebhookHandler::new(review_stream_service.clone());
 
+    // Create auth service
+    let user_repository = Arc::new(
+        MongoUserRepository::new(&env.review_stream_config.mongo_url)
+            .await
+            .expect("Could not create push repository"),
+    );
+    let auth_service = Arc::new(AuthService::new(user_repository.clone()));
+
     // Create WebHtmxState
     let web_htmx_state = WebHtmxState {
         flash_config: axum_flash::Config::new(axum_flash::Key::generate()),
         review_feed_service: review_stream_service,
+        auth_service,
         github_auth_config: web_htmx::state::GithubAuthConfig {
             client_id: env.github_auth_config.client_id.clone(),
             client_secret: env.github_auth_config.client_secret.clone(),
@@ -61,12 +71,6 @@ async fn main() {
             StatusCode::BAD_REQUEST
         }))
         .layer(SessionManagerLayer::new(session_store.clone()).with_secure(false));
-
-    let user_repository = Arc::new(
-        MongoUserRepository::new(&env.review_stream_config.mongo_url)
-            .await
-            .expect("Could not create push repository"),
-    );
 
     let user_memory_store = MongoUserStore {
         users: user_repository.clone(),

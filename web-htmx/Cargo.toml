@@ -17,6 +17,8 @@ http = { workspace = true }
 once_cell = { workspace = true }
 reqwest = { workspace = true }
 review-stream-service = { path = "../review-stream/review-stream-service" }
+auth-service = { path = "../auth/auth-service" }
+mongo-user-repository = { path = "../auth/adapters/mongo-user-repository" }
 rscx = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }

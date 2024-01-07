@@ -5,7 +5,9 @@ use axum::{
     Router,
 };
 
+use axum_login::login_required;
 use http::StatusCode;
+use mongo_user_repository::MongoUserStore;
 use rscx::html;
 use state::WebHtmxState;
 
@@ -30,9 +32,11 @@ pub fn routes(state: WebHtmxState) -> Router {
     Router::new()
         .with_state(state.clone())
         //##PLOP MERGE ROUTE HOOK##
-        .merge(auth_routes(state.clone()))
         .merge(feed_routes(state.clone()))
         .route(HOME, get(Redirect::temporary(HOME_REDIRECT)))
+        // Anything above this RequireAuth route will require authentication
+        .route_layer(login_required!(MongoUserStore, login_url = routes::login()))
+        .merge(auth_routes(state.clone()))
         .nest(PLAYGROUND, playground::routes())
         .nest_service(CLIENT, client_routes())
         .fallback(fallback)

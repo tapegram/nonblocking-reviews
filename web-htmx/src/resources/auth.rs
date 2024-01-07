@@ -1,12 +1,16 @@
+use crate::components::page_content::PageContent;
 use crate::state::WebHtmxState;
 use crate::{components::page::PageLayout, routes};
+use auth_service::get_user_for_login::GetUserForLoginInput;
 use axum::extract::{Query, State};
-use axum::response::{Html, IntoResponse};
+use axum::response::{Html, IntoResponse, Redirect};
 use axum::{routing::get, Router};
 
+use axum_login::AuthSession;
+use http::StatusCode;
+use mongo_user_repository::{Credentials, MongoUserStore};
 use rscx::{component, html, props};
 use serde::Deserialize;
-
 
 pub fn auth_routes(state: WebHtmxState) -> Router {
     Router::new()
@@ -43,16 +47,18 @@ struct GithubAuthCallbackQueryParams {
     code: String,
 }
 async fn get_github_auth_callback(
-    State(state): State<WebHtmxState>,
+    State(WebHtmxState {
+        auth_service,
+        github_auth_config,
+        ..
+    }): State<WebHtmxState>,
+    mut auth: AuthSession<MongoUserStore>,
     Query(query_params): Query<GithubAuthCallbackQueryParams>,
 ) -> impl IntoResponse {
     let client = reqwest::Client::new();
     let params = &[
-        ("client_id", state.github_auth_config.client_id.clone()),
-        (
-            "client_secret",
-            state.github_auth_config.client_secret.clone(),
-        ),
+        ("client_id", github_auth_config.client_id.clone()),
+        ("client_secret", github_auth_config.client_secret.clone()),
         ("code", query_params.code.clone()),
     ];
 
@@ -78,10 +84,29 @@ async fn get_github_auth_callback(
         .await
         .expect("Failed to parse access token response");
 
-    // We need to keep this token in the session of the user.
-    // Before that, we need to decide if we are relying PURELY on github auth or do we need our own
-    // user concept
-    Html(html! {
-        <p>{format!("{:?}", access_token_response)}</p>
-    })
+    let creds = Credentials {
+        access_code: access_token_response.access_token,
+    };
+
+    let user = match auth.authenticate(creds).await {
+        Ok(Some(user)) => user,
+        Ok(None) => return (StatusCode::UNAUTHORIZED, "Login failed").into_response(),
+        Err(_) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Login failed. Please try again.",
+            )
+                .into_response()
+        }
+    };
+
+    if auth.login(&user).await.is_err() {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Login failed. Please try again.",
+        )
+            .into_response();
+    }
+
+    Redirect::to(routes::HOME).into_response()
 }

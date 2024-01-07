@@ -20,6 +20,7 @@
 - Switch to using new auth method.
 - Refine session configurations: https://github.com/maxcountryman/axum-login/blob/main/examples/oauth2/src/web/app.rs
 - Include user information in context
+- Add CSRF safety like in https://github.com/maxcountryman/axum-login/blob/main/examples/oauth2/src/web/app.rs
 
 ## Personalization
 

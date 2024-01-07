@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use auth_service::service::AuthService;
 use axum::extract::FromRef;
 use review_stream_service::service::ReviewStreamService;
 
@@ -7,6 +8,7 @@ use review_stream_service::service::ReviewStreamService;
 pub struct WebHtmxState {
     pub flash_config: axum_flash::Config,
     pub review_feed_service: Arc<ReviewStreamService>,
+    pub auth_service: Arc<AuthService>,
     pub github_auth_config: GithubAuthConfig,
 }
 
