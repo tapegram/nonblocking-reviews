@@ -18,6 +18,8 @@ octocrab = { workspace = true }
 rand = { workspace = true, features = ["min_const_gen"] }
 review-stream-service = { path = "../review-stream/review-stream-service" }
 github-webhook-handler = { path = "../review-stream/adapters/github-webhook-handler" }
+auth-service = { path = "../auth/auth-service" }
+mongo-user-repository = { path = "../auth/adapters/mongo-user-repository" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true, features = ["full"] }

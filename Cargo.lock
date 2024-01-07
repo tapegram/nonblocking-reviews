@@ -1325,6 +1325,7 @@ dependencies = [
 name = "main"
 version = "0.1.0"
 dependencies = [
+ "auth-service",
  "axum",
  "axum-flash",
  "axum-login",
@@ -1334,6 +1335,7 @@ dependencies = [
  "http-body-util",
  "jsonwebtoken",
  "mongo-push-repository",
+ "mongo-user-repository",
  "octocrab",
  "rand",
  "review-stream-service",
