@@ -44,7 +44,7 @@ struct LoginFormProps {
 #[component]
 fn LoginForm(props: LoginFormProps) -> String {
     html! {
-        <a href=format!("https://github.com/login/oauth/authorize?scope=user:email%20repo&client_id={}", props.github_client_id)>
+        <a href=format!("https://github.com/login/oauth/authorize?scope=user:email&client_id={}", props.github_client_id)>
           Login with Github
         </a>
     }
