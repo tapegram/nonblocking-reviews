@@ -9,6 +9,12 @@ use tracing::instrument;
 pub struct Environment {
     pub review_stream_config: ReviewStreamConfig,
     pub openai_config: OpenAIConfig,
+    pub github_auth_config: GithubAuthConfig,
+}
+
+pub struct GithubAuthConfig {
+    pub client_id: String,
+    pub client_secret: String,
 }
 
 pub struct ReviewStreamConfig {
@@ -31,6 +37,11 @@ pub fn load_environment() -> Environment {
         },
         openai_config: OpenAIConfig {
             api_key: std::env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY must be set"),
+        },
+        github_auth_config: GithubAuthConfig {
+            client_id: std::env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID must be set"),
+            client_secret: std::env::var("GITHUB_CLIENT_SECRET")
+                .expect("GITHUB_CLIENT_SECRET must be set"),
         },
     }
 }
