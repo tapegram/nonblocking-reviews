@@ -33,7 +33,13 @@ pub fn _client() -> String {
     CLIENT.into()
 }
 
+pub const LOGIN: &str = "/login";
+pub fn login() -> String {
+    LOGIN.into()
+}
+
 pub const FEED: &str = "/feed";
 pub fn feed() -> String {
     FEED.into()
 }
+
