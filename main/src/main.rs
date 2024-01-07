@@ -44,6 +44,10 @@ async fn main() {
     let web_htmx_state = WebHtmxState {
         flash_config: axum_flash::Config::new(axum_flash::Key::generate()),
         review_feed_service: review_stream_service,
+        github_auth_config: web_htmx::state::GithubAuthConfig {
+            client_id: env.github_auth_config.client_id.clone(),
+            client_secret: env.github_auth_config.client_secret.clone(),
+        },
     };
 
     let app = Router::new()
