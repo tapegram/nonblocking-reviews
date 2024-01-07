@@ -3,6 +3,8 @@ resolver = "2"
 
 members = [
           ##PLOP NEW PACKAGE HOOK##
+          "auth/auth-service",
+          "auth/adapters/mongo-user-repository",
           "review-stream/review-stream-service",
           "review-stream/adapters/mongo-push-repository",
           "review-stream/adapters/github-webhook-handler",

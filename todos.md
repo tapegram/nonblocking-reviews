@@ -15,9 +15,12 @@
 - Can we make processing more async?
 - Can we batch summary requests to save money?
 
+## Auth
+
+- Paste in auth service / update with https://github.com/maxcountryman/axum-login/blob/main/examples/oauth2/src/users.rs example
+
 ## Personalization
 
-- Loging in with Github OAuth locally. Next step is setting up login form
 - Hard coded rules about who might be interested in what
 - Discovery work with openai tooling
 
