@@ -77,3 +77,17 @@ pub struct Item {
     pub timestamp: DateTime<Utc>,
     pub repository: String,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct User {
+    pub id: String,
+    pub email: String,
+    pub subscriptions: Vec<RepositorySubscription>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RepositorySubscription {
+    pub id: String,
+    pub external_id: String, // The github repository ID
+    pub name: String,
+}
