@@ -21,9 +21,23 @@
 
 ## Personalization
 
-- Only show info for repositories you have access to
-- Hard coded rules about who might be interested in what
-- Discovery work with openai tooling
+### Subscribe to repos
+- Add page for users to choose which repos (that they have access to) that they want to include in their feed.
+- Add a webhook handler for removing repo when the user loses access.
+- Only display items in feed from subscribed repositories
+- Can unsubscribe from repos
+
+### Collect info on relevance
+- What files does the user often touch
+- is the commiting user someone with overlapping commit histories?
+- What if the commit is from someone in a shared group (maybe codeowners?)
+- Is this change really big?
+
+### Vector DB / Embeddings
+- Can we keep track of user interests (like from above) and then use a search to get relevant pushes?
+
+### Can we explain why the change is relevant to the user?
+- Feed the above info plus the existing commit summary into the summary model?
 
 ## Multitenant
 
