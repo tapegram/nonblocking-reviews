@@ -14,6 +14,8 @@ use state::WebHtmxState;
 use web_client::routes as client_routes;
 
 //##PLOP USE RESOURCE HOOK##
+use resources::repository::repository_routes;
+use resources::repositories::repositories_routes;
 use components::{not_found_message::NotFoundMessage, page::PageLayout};
 use context::provide_context_layer;
 use resources::auth::auth_routes;
@@ -32,6 +34,8 @@ pub fn routes(state: WebHtmxState) -> Router {
     Router::new()
         .with_state(state.clone())
         //##PLOP MERGE ROUTE HOOK##
+.merge(repository_routes(state.clone()))
+.merge(repositories_routes(state.clone()))
         .merge(feed_routes(state.clone()))
         .route(HOME, get(Redirect::temporary(HOME_REDIRECT)))
         // Anything above this RequireAuth route will require authentication

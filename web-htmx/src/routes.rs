@@ -48,3 +48,23 @@ pub fn feed() -> String {
     FEED.into()
 }
 
+pub const REPOSITORIES: &str = "/repositories";
+pub fn repositories() -> String {
+    REPOSITORIES.into()
+}
+
+pub const REPOSITORIES_CREATE_FORM: &str = "/repositories/create-form";
+pub fn repositories_create_form() -> String {
+    REPOSITORIES_CREATE_FORM.into()
+}
+
+pub const REPOSITORY: &str = "/repositories/:repository_id";
+pub fn repository(repository_id: String) -> String {
+    format!("/repositories/{}", repository_id)
+}
+
+pub const REPOSITORY_EDIT_FORM: &str = "/repositories/:repository_id/edit-form";
+pub fn repository_edit_form(repository_id: String) -> String {
+    format!("/repositories/{}/edit-form", repository_id)
+}
+

@@ -1,5 +1,4 @@
-use http::{HeaderMap, StatusCode};
-use rscx::{component, html, props};
+use crate::{components::page::PageLayout, routes, state::WebHtmxState};
 use axum::{
     extract::State,
     response::{Html, IntoResponse},
@@ -7,14 +6,9 @@ use axum::{
     Form, Router,
 };
 use axum_flash::Flash;
+use http::{HeaderMap, StatusCode};
+use rscx::{component, html, props};
 use serde::Deserialize;
-use crate::{
-    components::{
-        page::PageLayout,
-    },
-    routes,
-    state::WebHtmxState,
-};
 use web_client::server::{
     attrs::Attrs,
     form::{Button, GridCell, GridLayout, Label, TextInput},
@@ -22,43 +16,38 @@ use web_client::server::{
     modal::{Modal, ModalSize},
 };
 
-pub fn {{snakeCase resource_name}}_routes(state: WebHtmxState) -> Router {
+pub fn repositories_routes(state: WebHtmxState) -> Router {
     Router::new()
+        .route(routes::REPOSITORIES, get(get_repositories))
         .route(
-            routes::{{constantCase resource_name}}, 
-            get(get_{{snakeCase resource_name}})
-        )
-        .route(
-            routes::{{constantCase resource_name}}_CREATE_FORM,
+            routes::REPOSITORIES_CREATE_FORM,
             get(get_create_form).post(post_create_form),
         )
         .with_state(state)
 }
 
-async fn get_{{snakeCase resource_name}}(
-    State(state): State<WebHtmxState>,
-) -> impl IntoResponse {
-  todo!()
+async fn get_repositories(State(state): State<WebHtmxState>) -> impl IntoResponse {
+    todo!()
 }
 
 async fn get_create_form(headers: HeaderMap) -> impl IntoResponse {
     Html(html! {
         <PageLayout
-            header="Add {{pascalCase resource_name}}"
+            header="Add Repositories"
         >
             <Modal size=ModalSize::MediumScreen>
                 <SecondaryHeader
-                    title="Add {{pascalCase resource_name_singular}}"
+                    title="Add Repository"
                     subtitle="Enter details below."
                 />
-                <{{pascalCase resource_name_singular}}Form action=routes::{{snakeCase resource_name}}_create_form() />
+                <RepositoryForm action=routes::repositories_create_form() />
             </Modal>
         </PageLayout>
     })
 }
 
 #[props]
-pub struct {{pascalCase resource_name_singular}}FormProps {
+pub struct RepositoryFormProps {
     #[builder(setter(into))]
     action: String,
 
@@ -67,7 +56,7 @@ pub struct {{pascalCase resource_name_singular}}FormProps {
 }
 
 #[component]
-pub fn {{pascalCase resource_name_singular}}Form(props: {{pascalCase resource_name_singular}}FormProps) -> String {
+pub fn RepositoryForm(props: RepositoryFormProps) -> String {
     html! {
         <form hx-post=props.action>
             <div class="pb-12">
@@ -92,20 +81,20 @@ pub fn {{pascalCase resource_name_singular}}Form(props: {{pascalCase resource_na
 }
 
 #[derive(Deserialize, Debug)]
-struct Add{{pascalCase resource_name_singular}}FormData {
+struct AddRepositoryFormData {
     name: String,
 }
 
 async fn post_create_form(
     State(state): State<WebHtmxState>,
     flash: Flash,
-    Form(form): Form<Add{{pascalCase resource_name_singular}}FormData>,
+    Form(form): Form<AddRepositoryFormData>,
 ) -> impl IntoResponse {
     (
         StatusCode::OK,
-        flash.success("{{pascalCase resource_name_singular}} added successfully!"),
+        flash.success("Repository added successfully!"),
         [
-            ("hx-redirect", routes::{{snakeCase resource_name}}()),
+            ("hx-redirect", routes::repositories()),
             ("hx-retarget", "body".into()),
         ],
     )

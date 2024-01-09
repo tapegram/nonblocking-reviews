@@ -41,5 +41,4 @@
 
 ## Multitenant
 
-- Auth via github
 - Do not allow users to see commits from repos they dont have permissions for.
