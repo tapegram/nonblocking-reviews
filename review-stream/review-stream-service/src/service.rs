@@ -6,11 +6,19 @@ use crate::{
     get_feed::{GetFeed, GetFeedInput, GetFeedOutput},
     handle_github_push::{HandleGithubPush, HandleGithubPushInput, HandleGithubPushOutput},
     ports::push_repository::PushRepository,
+    subscribe_to_repository::{
+        SubscribeToRepository, SubscribeToRepositoryInput, SubscribeToRepositoryOutput,
+    },
+    unsubscribe_from_repository::{
+        UnsubscribeFromRepository, UnsubscribeFromRepositoryInput, UnsubscribeFromRepositoryOutput,
+    },
 };
 
 #[derive(Clone)]
 pub struct ReviewStreamService {
     //##PLOP INSERT COMMAND HOOK##
+    pub unsubscribe_from_repository: UnsubscribeFromRepository,
+    pub subscribe_to_repository: SubscribeToRepository,
     pub get_feed: GetFeed,
     pub handle_github_push: HandleGithubPush,
 }
@@ -20,6 +28,12 @@ impl ReviewStreamService {
         let openai_client = Arc::new(Client::new(openai_api_key));
         Self {
             //##PLOP INSERT COMMAND INSTANTIATION HOOK##
+            unsubscribe_from_repository: UnsubscribeFromRepository {
+              // Add any dependencies for the command here. They should be passed into this function and supplied by main.rs.
+            },
+            subscribe_to_repository: SubscribeToRepository {
+              // Add any dependencies for the command here. They should be passed into this function and supplied by main.rs.
+            },
             get_feed: GetFeed {
                 push_repository: push_repository.clone(),
             },
@@ -30,6 +44,24 @@ impl ReviewStreamService {
         }
     }
     //##PLOP INSERT DELEGATE HOOK##
+    pub async fn unsubscribe_from_repository(
+        &self,
+        input: UnsubscribeFromRepositoryInput,
+    ) -> UnsubscribeFromRepositoryOutput {
+        self.unsubscribe_from_repository
+            .unsubscribe_from_repository(input)
+            .await
+    }
+
+    pub async fn subscribe_to_repository(
+        &self,
+        input: SubscribeToRepositoryInput,
+    ) -> SubscribeToRepositoryOutput {
+        self.subscribe_to_repository
+            .subscribe_to_repository(input)
+            .await
+    }
+
     pub async fn get_feed(&self, input: GetFeedInput) -> GetFeedOutput {
         self.get_feed.get_feed(input).await
     }
