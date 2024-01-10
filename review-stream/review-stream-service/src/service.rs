@@ -5,7 +5,7 @@ use openai_api_rs::v1::api::Client;
 use crate::{
     get_feed::{GetFeed, GetFeedInput, GetFeedOutput},
     handle_github_push::{HandleGithubPush, HandleGithubPushInput, HandleGithubPushOutput},
-    ports::push_repository::PushRepository,
+    ports::{push_repository::PushRepository, user_repository::UserRepository},
     subscribe_to_repository::{
         SubscribeToRepository, SubscribeToRepositoryInput, SubscribeToRepositoryOutput,
     },
@@ -24,7 +24,11 @@ pub struct ReviewStreamService {
 }
 
 impl ReviewStreamService {
-    pub fn new(push_repository: Arc<dyn PushRepository>, openai_api_key: String) -> Self {
+    pub fn new(
+        push_repository: Arc<dyn PushRepository>,
+        user_repository: Arc<dyn UserRepository>,
+        openai_api_key: String,
+    ) -> Self {
         let openai_client = Arc::new(Client::new(openai_api_key));
         Self {
             //##PLOP INSERT COMMAND INSTANTIATION HOOK##
@@ -32,7 +36,7 @@ impl ReviewStreamService {
               // Add any dependencies for the command here. They should be passed into this function and supplied by main.rs.
             },
             subscribe_to_repository: SubscribeToRepository {
-              // Add any dependencies for the command here. They should be passed into this function and supplied by main.rs.
+                user_repository: user_repository.clone(),
             },
             get_feed: GetFeed {
                 push_repository: push_repository.clone(),

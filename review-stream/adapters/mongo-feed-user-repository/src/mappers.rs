@@ -1,0 +1,41 @@
+use review_stream_service::models::{RepositorySubscription, User};
+
+use crate::records::{RepositorySubscriptionRecord, UserRecord};
+
+// Mapping from User to UserRecord
+fn user_to_user_record(user: &User) -> UserRecord {
+    let subscriptions = user
+        .subscriptions
+        .iter()
+        .map(|sub| RepositorySubscriptionRecord {
+            id: sub.id.clone(),
+            external_id: sub.external_id.clone(),
+            name: sub.name.clone(),
+        })
+        .collect();
+
+    UserRecord {
+        id: user.id.clone(),
+        email: user.email.clone(),
+        subscriptions,
+    }
+}
+
+// Mapping from UserRecord to User
+fn user_record_to_user(user_record: &UserRecord) -> User {
+    let subscriptions = user_record
+        .subscriptions
+        .iter()
+        .map(|sub| RepositorySubscription {
+            id: sub.id.clone(),
+            external_id: sub.external_id.clone(),
+            name: sub.name.clone(),
+        })
+        .collect();
+
+    User {
+        id: user_record.id.clone(),
+        email: user_record.email.clone(),
+        subscriptions,
+    }
+}

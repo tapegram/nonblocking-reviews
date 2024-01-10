@@ -1334,6 +1334,7 @@ dependencies = [
  "github-webhook-handler",
  "http-body-util",
  "jsonwebtoken",
+ "mongo-feed-user-repository",
  "mongo-push-repository",
  "mongo-user-repository",
  "octocrab",
@@ -1434,6 +1435,27 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "mongo-feed-user-repository"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "axum-login",
+ "chrono",
+ "fake",
+ "futures",
+ "mongo-testcontainer",
+ "mongodb",
+ "pretty_assertions",
+ "review-stream-service",
+ "serde",
+ "testcontainers",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "uuid",
 ]
 
 [[package]]

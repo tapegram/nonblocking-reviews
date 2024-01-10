@@ -7,6 +7,7 @@ use axum_login::{tower_sessions::SessionManagerLayer, AuthManagerLayerBuilder};
 
 use environment::load_environment;
 use github_webhook_handler::handler::{github_webhook_handler, GithubWebhookHandler};
+use mongo_feed_user_repository::mongo_user_repository::MongoFeedUserRepository;
 use mongo_push_repository::mongo_push_repository::MongoPushRepository;
 use mongo_user_repository::{MongoUserRepository, MongoUserStore};
 use review_stream_service::service::ReviewStreamService;
@@ -36,9 +37,15 @@ async fn main() {
             .await
             .expect("Could not create push repository"),
     );
+    let feed_user_repository = Arc::new(
+        MongoFeedUserRepository::new(&env.review_stream_config.mongo_url)
+            .await
+            .expect("Could not create feed user repository"),
+    );
 
     let review_stream_service = Arc::new(ReviewStreamService::new(
         push_repository,
+        feed_user_repository,
         env.openai_config.api_key.clone(),
     ));
 
