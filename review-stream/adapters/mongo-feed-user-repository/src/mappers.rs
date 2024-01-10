@@ -16,8 +16,8 @@ fn user_to_user_record(user: &User) -> UserRecord {
 
     UserRecord {
         id: user.id.clone(),
-        email: user.email.clone(),
         subscriptions,
+        auth_id: user.auth_id.clone(),
     }
 }
 
@@ -35,7 +35,7 @@ fn user_record_to_user(user_record: &UserRecord) -> User {
 
     User {
         id: user_record.id.clone(),
-        email: user_record.email.clone(),
         subscriptions,
+        auth_id: user_record.auth_id.clone(),
     }
 }

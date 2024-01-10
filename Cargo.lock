@@ -2084,6 +2084,7 @@ dependencies = [
  "http-body-util",
  "octocrab",
  "openai-api-rs",
+ "reqwest",
  "thiserror",
  "tokio",
  "tracing",

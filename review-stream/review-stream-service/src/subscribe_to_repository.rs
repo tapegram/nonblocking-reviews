@@ -19,6 +19,7 @@ pub struct SubscribeToRepositoryInput {
     // Put input fields here
     pub repository_name: String, // Should be of the format {owner}/{repo}
     pub user_id: String,
+    pub user_github_access_token: String, // To fetch the repo
 }
 
 // Change the return type, if needed
@@ -27,10 +28,23 @@ pub type SubscribeToRepositoryOutput = Result<(), SubscribeToRepositoryFailure>;
 impl SubscribeToRepository {
     pub async fn subscribe_to_repository(
         &self,
-        _input: SubscribeToRepositoryInput,
+        input: SubscribeToRepositoryInput,
     ) -> SubscribeToRepositoryOutput {
         // TODO: we should either ban subsribing to private repos entirely, or at least do a check
         // to see if the user should have access to a feed from this repository.
+        // curl -L \
+        // -H "Accept: application/vnd.github+json" \
+        // -H "Authorization: Bearer <YOUR-TOKEN>" \
+        // -H "X-GitHub-Api-Version: 2022-11-28" \
+        //  https://api.github.com/repos/OWNER/REPO
+        let user = self
+            .user_repository
+            .get_user(input.user_id.clone())
+            .await
+            .map_err(|e| SubscribeToRepositoryFailure::Unknown(e.to_string()))?
+            .ok_or(SubscribeToRepositoryFailure::NotFound)?;
+
+        // user.add_subscription(input.repository_name.clone());
         todo!();
     }
 }

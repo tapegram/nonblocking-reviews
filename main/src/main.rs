@@ -37,6 +37,7 @@ async fn main() {
             .await
             .expect("Could not create push repository"),
     );
+
     let feed_user_repository = Arc::new(
         MongoFeedUserRepository::new(&env.review_stream_config.mongo_url)
             .await

@@ -81,7 +81,7 @@ pub struct Item {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct User {
     pub id: String,
-    pub email: String,
+    pub auth_id: String, // The id of the user in the Auth Service
     pub subscriptions: Vec<RepositorySubscription>,
 }
 
