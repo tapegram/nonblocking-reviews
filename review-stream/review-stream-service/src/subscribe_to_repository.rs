@@ -1,8 +1,10 @@
 use std::sync::Arc;
 
+use reqwest::header::{ACCEPT, AUTHORIZATION};
+use serde::Deserialize;
 use thiserror::Error;
 
-use crate::ports::user_repository::UserRepository;
+use crate::{models::RepositorySubscription, ports::user_repository::UserRepository};
 
 // Example repo dependency
 // use crate::ports::worksite_repository::WorksiteRepository;
@@ -30,13 +32,43 @@ impl SubscribeToRepository {
         &self,
         input: SubscribeToRepositoryInput,
     ) -> SubscribeToRepositoryOutput {
-        // TODO: we should either ban subsribing to private repos entirely, or at least do a check
-        // to see if the user should have access to a feed from this repository.
-        // curl -L \
-        // -H "Accept: application/vnd.github+json" \
-        // -H "Authorization: Bearer <YOUR-TOKEN>" \
-        // -H "X-GitHub-Api-Version: 2022-11-28" \
-        //  https://api.github.com/repos/OWNER/REPO
+        #[derive(Debug, Deserialize)]
+        struct RepoInfo {
+            id: String,
+            private: bool,
+            full_name: String,
+            permissions: Permissions,
+        }
+        #[derive(Debug, Deserialize)]
+        struct Permissions {
+            pull: String,
+        }
+
+        let repo_info = reqwest::Client::new()
+            // Expecting repository_name to be of the format {owner}/{repo}
+            .get(format!(
+                "https://api.github.com/repos/{}",
+                input.repository_name
+            ))
+            .header(ACCEPT.as_str(), "application/vnd.github+json")
+            .header("X-GitHub-Api-Version", "2022-11-28")
+            .header(
+                AUTHORIZATION.as_str(),
+                format!("Bearer {}", &input.user_github_access_token),
+            )
+            .send()
+            .await
+            .map_err(|e| SubscribeToRepositoryFailure::Unknown(e.to_string()))?
+            .json::<RepoInfo>()
+            .await
+            .map_err(|e| SubscribeToRepositoryFailure::Unknown(e.to_string()))?;
+
+        let subscription = RepositorySubscription {
+            id: uuid::Uuid::new_v4().to_string(),
+            external_id: repo_info.id,
+            name: repo_info.full_name,
+        };
+
         let user = self
             .user_repository
             .get_user(input.user_id.clone())
@@ -44,8 +76,14 @@ impl SubscribeToRepository {
             .map_err(|e| SubscribeToRepositoryFailure::Unknown(e.to_string()))?
             .ok_or(SubscribeToRepositoryFailure::NotFound)?;
 
-        // user.add_subscription(input.repository_name.clone());
-        todo!();
+        let user = user.add_subscription(subscription);
+
+        self.user_repository
+            .save(user)
+            .await
+            .map_err(|e| SubscribeToRepositoryFailure::Unknown(e.to_string()))?;
+
+        Ok(())
     }
 }
 

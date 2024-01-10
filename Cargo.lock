@@ -2085,6 +2085,7 @@ dependencies = [
  "octocrab",
  "openai-api-rs",
  "reqwest",
+ "serde",
  "thiserror",
  "tokio",
  "tracing",

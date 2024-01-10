@@ -10,10 +10,11 @@ edition = "2021"
 async-trait = { workspace = true }
 chrono = { workspace = true }
 http-body-util = { workspace = true }
-octocrab = { workspace = true }                   # Should this be kept in the adapter?
+octocrab = { workspace = true }                     # Should this be kept in the adapter?
 openai-api-rs = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing = { workspace = true }
 uuid = { workspace = true }
-reqwest = { workspace = true }

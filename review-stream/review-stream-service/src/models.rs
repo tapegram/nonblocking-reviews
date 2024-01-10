@@ -85,6 +85,27 @@ pub struct User {
     pub subscriptions: Vec<RepositorySubscription>,
 }
 
+impl User {
+    pub fn new(id: String, auth_id: String) -> Self {
+        Self {
+            id,
+            auth_id,
+            subscriptions: vec![],
+        }
+    }
+
+    pub fn add_subscription(&self, subscription: RepositorySubscription) -> User {
+        if self.subscriptions.iter().any(|s| s.id == subscription.id) {
+            return self.clone();
+        }
+
+        User {
+            subscriptions: [vec![subscription].as_slice(), self.subscriptions.as_slice()].concat(),
+            ..self.clone()
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RepositorySubscription {
     pub id: String,
