@@ -30,17 +30,17 @@ pub fn repository_routes(state: WebHtmxState) -> Router {
 }
 
 async fn get_repository(
-    extract::Path((id)): extract::Path<(
+    extract::Path(_id): extract::Path<(
         String,
     )>,
-    State(state): State<WebHtmxState>,
+    State(_state): State<WebHtmxState>,
 ) -> impl IntoResponse {
   todo!()
 }
 
 async fn get_edit_form(
-    extract::Path(id): extract::Path<String>,
-    State(state): State<WebHtmxState>,
+    extract::Path(_id): extract::Path<String>,
+    State(_state): State<WebHtmxState>,
 ) -> impl IntoResponse {
     Html(html! {
         <PageLayout
@@ -63,10 +63,10 @@ struct UpdateRepositoryFormData {
 }
 
 async fn post_edit_form(
-    extract::Path(id): extract::Path<String>,
-    State(state): State<WebHtmxState>,
+    extract::Path(_id): extract::Path<String>,
+    State(_state): State<WebHtmxState>,
     flash: Flash,
-    Form(form): Form<UpdateRepositoryFormData>,
+    Form(_form): Form<UpdateRepositoryFormData>,
 ) -> impl IntoResponse {
     (
         StatusCode::OK,

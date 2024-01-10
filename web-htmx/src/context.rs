@@ -1,4 +1,4 @@
-use auth_service::models::{User, UserPermission, UserRole};
+use auth_service::models::{User};
 use axum::{
     body::Body,
     extract::{Query, State},
@@ -33,9 +33,9 @@ tokio::task_local! {
 }
 
 pub async fn provide_context_layer(
-    State(state): State<WebHtmxState>,
+    State(_state): State<WebHtmxState>,
     auth: AuthSession<MongoUserStore>,
-    session: Session,
+    _session: Session,
     request: Request<Body>,
     next: Next,
 ) -> Response {

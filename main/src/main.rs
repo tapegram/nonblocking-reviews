@@ -17,7 +17,7 @@ use tower::ServiceBuilder;
 use tower_sessions::{
     cookie::{time::Duration, SameSite},
     mongodb::Client,
-    Expiry, MemoryStore, MongoDBStore,
+    Expiry, MongoDBStore,
 };
 use web_htmx::{livereload, routes as web_routes, state::WebHtmxState};
 

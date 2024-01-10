@@ -1,15 +1,15 @@
-use crate::components::page_content::PageContent;
+
 use crate::state::WebHtmxState;
-use crate::{components::page::PageLayout, routes};
-use auth_service::get_user_for_login::GetUserForLoginInput;
+use crate::{routes};
+
 use axum::extract::{Query, State};
-use axum::response::{Html, IntoResponse, Redirect};
+use axum::response::{IntoResponse, Redirect};
 use axum::{routing::get, Router};
 
 use axum_login::AuthSession;
 use http::StatusCode;
 use mongo_user_repository::{Credentials, MongoUserStore};
-use rscx::{component, html, props};
+
 use serde::Deserialize;
 use tracing::info;
 

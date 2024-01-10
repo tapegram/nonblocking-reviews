@@ -27,7 +27,7 @@ pub type SubscribeToRepositoryOutput = Result<(), SubscribeToRepositoryFailure>;
 impl SubscribeToRepository {
     pub async fn subscribe_to_repository(
         &self,
-        input: SubscribeToRepositoryInput,
+        _input: SubscribeToRepositoryInput,
     ) -> SubscribeToRepositoryOutput {
         // TODO: we should either ban subsribing to private repos entirely, or at least do a check
         // to see if the user should have access to a feed from this repository.

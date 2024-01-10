@@ -1,4 +1,4 @@
-use std::sync::Arc;
+
 
 use thiserror::Error;
 
@@ -22,7 +22,7 @@ pub struct UnsubscribeFromRepositoryInput {
 pub type UnsubscribeFromRepositoryOutput = Result<(), UnsubscribeFromRepositoryFailure>;
 
 impl UnsubscribeFromRepository {
-    pub async fn unsubscribe_from_repository(&self, input: UnsubscribeFromRepositoryInput) -> UnsubscribeFromRepositoryOutput {
+    pub async fn unsubscribe_from_repository(&self, _input: UnsubscribeFromRepositoryInput) -> UnsubscribeFromRepositoryOutput {
         todo!("Implement unsubscribe_from_repository")
     }
 }

@@ -1,12 +1,12 @@
 use async_trait::async_trait;
 
-use futures::TryStreamExt;
-use mongodb::bson::doc;
+
+
 use review_stream_service::{
     models::User,
     ports::user_repository::{RepositoryFailure, UserRepository},
 };
-use tracing::info;
+
 
 use crate::records::UserRecord;
 
@@ -49,7 +49,7 @@ impl UserRepository for MongoFeedUserRepository {
         todo!("")
     }
 
-    async fn save(&self, user: User) -> Result<(), RepositoryFailure> {
+    async fn save(&self, _user: User) -> Result<(), RepositoryFailure> {
         // let filter = doc! {"id": push.id.clone()};
         // let record = to_push_record(&push);
         // let options = mongodb::options::ReplaceOptions::builder()
