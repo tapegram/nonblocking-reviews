@@ -22,7 +22,7 @@ fn user_to_user_record(user: &User) -> UserRecord {
 }
 
 // Mapping from UserRecord to User
-fn user_record_to_user(user_record: &UserRecord) -> User {
+pub fn user_record_to_user(user_record: &UserRecord) -> User {
     let subscriptions = user_record
         .subscriptions
         .iter()

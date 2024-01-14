@@ -4,6 +4,7 @@ use openai_api_rs::v1::api::Client;
 
 use crate::{
     get_feed::{GetFeed, GetFeedInput, GetFeedOutput},
+    get_user::{GetUser, GetUserInput, GetUserOutput},
     handle_github_push::{HandleGithubPush, HandleGithubPushInput, HandleGithubPushOutput},
     ports::{push_repository::PushRepository, user_repository::UserRepository},
     subscribe_to_repository::{
@@ -17,6 +18,7 @@ use crate::{
 #[derive(Clone)]
 pub struct ReviewStreamService {
     //##PLOP INSERT COMMAND HOOK##
+    pub get_user: GetUser,
     pub unsubscribe_from_repository: UnsubscribeFromRepository,
     pub subscribe_to_repository: SubscribeToRepository,
     pub get_feed: GetFeed,
@@ -32,6 +34,9 @@ impl ReviewStreamService {
         let openai_client = Arc::new(Client::new(openai_api_key));
         Self {
             //##PLOP INSERT COMMAND INSTANTIATION HOOK##
+            get_user: GetUser {
+                user_repository: user_repository.clone(),
+            },
             unsubscribe_from_repository: UnsubscribeFromRepository {
               // Add any dependencies for the command here. They should be passed into this function and supplied by main.rs.
             },
@@ -48,6 +53,10 @@ impl ReviewStreamService {
         }
     }
     //##PLOP INSERT DELEGATE HOOK##
+    pub async fn get_user(&self, input: GetUserInput) -> GetUserOutput {
+        self.get_user.get_user(input).await
+    }
+
     pub async fn unsubscribe_from_repository(
         &self,
         input: UnsubscribeFromRepositoryInput,
