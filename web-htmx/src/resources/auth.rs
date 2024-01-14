@@ -1,6 +1,5 @@
-
+use crate::routes;
 use crate::state::WebHtmxState;
-use crate::{routes};
 
 use axum::extract::{Query, State};
 use axum::response::{IntoResponse, Redirect};
@@ -10,6 +9,7 @@ use axum_login::AuthSession;
 use http::StatusCode;
 use mongo_user_repository::{Credentials, MongoUserStore};
 
+use review_stream_service::create_user::CreateUserInput;
 use serde::Deserialize;
 use tracing::info;
 
@@ -36,7 +36,9 @@ struct GithubAuthCallbackQueryParams {
 }
 async fn get_github_auth_callback(
     State(WebHtmxState {
-        github_auth_config, ..
+        github_auth_config,
+        review_feed_service,
+        ..
     }): State<WebHtmxState>,
     mut auth: AuthSession<MongoUserStore>,
     Query(query_params): Query<GithubAuthCallbackQueryParams>,
@@ -97,6 +99,16 @@ async fn get_github_auth_callback(
         )
             .into_response();
     }
+
+    info!("Creating user in review stream if they don't already exist");
+    let input = CreateUserInput {
+        auth_id: user.id.clone(),
+    };
+
+    review_feed_service
+        .create_user(input)
+        .await
+        .expect("Failed to create user in review service");
 
     info!("Logged in!");
 

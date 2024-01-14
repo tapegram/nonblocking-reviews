@@ -3,7 +3,7 @@ use review_stream_service::models::{RepositorySubscription, User};
 use crate::records::{RepositorySubscriptionRecord, UserRecord};
 
 // Mapping from User to UserRecord
-fn user_to_user_record(user: &User) -> UserRecord {
+pub fn user_to_user_record(user: &User) -> UserRecord {
     let subscriptions = user
         .subscriptions
         .iter()

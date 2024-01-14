@@ -8,3 +8,4 @@ pub mod get_feed;
 pub mod subscribe_to_repository;
 pub mod unsubscribe_from_repository;
 pub mod get_user;
+pub mod create_user;

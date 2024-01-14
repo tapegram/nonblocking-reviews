@@ -6,7 +6,10 @@ use review_stream_service::{
     ports::user_repository::{RepositoryFailure, UserRepository},
 };
 
-use crate::{mappers::user_record_to_user, records::UserRecord};
+use crate::{
+    mappers::{user_record_to_user, user_to_user_record},
+    records::UserRecord,
+};
 
 #[derive(Clone, Debug)]
 pub struct MongoFeedUserRepository {
@@ -57,17 +60,16 @@ impl UserRepository for MongoFeedUserRepository {
         Ok(maybe_user.map(|u| user_record_to_user(&u)))
     }
 
-    async fn save(&self, _user: User) -> Result<(), RepositoryFailure> {
-        // let filter = doc! {"id": push.id.clone()};
-        // let record = to_push_record(&push);
-        // let options = mongodb::options::ReplaceOptions::builder()
-        //     .upsert(true)
-        //     .build();
-        // self.collection
-        //     .replace_one(filter, record, options)
-        //     .await
-        //     .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
-        // Ok(())
-        todo!()
+    async fn save(&self, user: User) -> Result<(), RepositoryFailure> {
+        let filter = doc! {"id": user.id.clone()};
+        let record = user_to_user_record(&user);
+        let options = mongodb::options::ReplaceOptions::builder()
+            .upsert(true)
+            .build();
+        self.collection
+            .replace_one(filter, record, options)
+            .await
+            .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
+        Ok(())
     }
 }

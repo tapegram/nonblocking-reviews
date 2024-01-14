@@ -3,6 +3,7 @@ use std::sync::Arc;
 use openai_api_rs::v1::api::Client;
 
 use crate::{
+    create_user::{CreateUser, CreateUserInput, CreateUserOutput},
     get_feed::{GetFeed, GetFeedInput, GetFeedOutput},
     get_user::{GetUser, GetUserInput, GetUserOutput},
     handle_github_push::{HandleGithubPush, HandleGithubPushInput, HandleGithubPushOutput},
@@ -18,6 +19,7 @@ use crate::{
 #[derive(Clone)]
 pub struct ReviewStreamService {
     //##PLOP INSERT COMMAND HOOK##
+    pub create_user: CreateUser,
     pub get_user: GetUser,
     pub unsubscribe_from_repository: UnsubscribeFromRepository,
     pub subscribe_to_repository: SubscribeToRepository,
@@ -34,6 +36,9 @@ impl ReviewStreamService {
         let openai_client = Arc::new(Client::new(openai_api_key));
         Self {
             //##PLOP INSERT COMMAND INSTANTIATION HOOK##
+            create_user: CreateUser {
+                user_repository: user_repository.clone(),
+            },
             get_user: GetUser {
                 user_repository: user_repository.clone(),
             },
@@ -53,6 +58,10 @@ impl ReviewStreamService {
         }
     }
     //##PLOP INSERT DELEGATE HOOK##
+    pub async fn create_user(&self, input: CreateUserInput) -> CreateUserOutput {
+        self.create_user.create_user(input).await
+    }
+
     pub async fn get_user(&self, input: GetUserInput) -> GetUserOutput {
         self.get_user.get_user(input).await
     }
