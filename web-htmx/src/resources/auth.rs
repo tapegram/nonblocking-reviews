@@ -103,6 +103,7 @@ async fn get_github_auth_callback(
     info!("Creating user in review stream if they don't already exist");
     let input = CreateUserInput {
         auth_id: user.id.clone(),
+        email: user.email.clone(),
     };
 
     review_feed_service

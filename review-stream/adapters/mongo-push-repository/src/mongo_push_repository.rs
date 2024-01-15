@@ -37,14 +37,6 @@ impl MongoPushRepository {
 #[async_trait]
 impl PushRepository for MongoPushRepository {
     async fn get_push(&self, _id: String) -> Result<Option<Push>, RepositoryFailure> {
-        // let filter = doc! { "id": id };
-        // let maybe_worksite = self
-        //     .collection
-        //     .find_one(filter, None)
-        //     .await
-        //     .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
-        //
-        // Ok(maybe_worksite.map(|w| w.to_worksite()))
         todo!("")
     }
 

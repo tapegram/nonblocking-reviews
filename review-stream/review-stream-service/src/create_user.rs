@@ -13,6 +13,7 @@ pub struct CreateUser {
 pub struct CreateUserInput {
     // Put input fields here
     pub auth_id: String,
+    pub email: String,
 }
 
 // Change the return type, if needed
@@ -34,6 +35,7 @@ impl CreateUser {
         self.user_repository
             .save(User {
                 id: uuid::Uuid::new_v4().to_string(),
+                email: input.email,
                 auth_id: input.auth_id,
                 subscriptions: vec![],
             })

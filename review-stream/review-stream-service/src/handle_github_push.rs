@@ -61,6 +61,10 @@ impl HandleGithubPush {
             .await
             .map_err(|e| HandleGithubPushFailure::Unknown(e.to_string()))?;
 
+        // We also want to record all of the files that were changed in the last push
+        // by the committer. This will allow us to do some simple personalization of the feed based
+        // on file changes
+
         Ok(())
     }
 
@@ -112,7 +116,6 @@ impl HandleGithubPush {
         info!("Summary response {:?}", summary_completion);
 
         let choices = summary_completion.choices;
-        
 
         choices[0].message.content.clone().unwrap()
     }

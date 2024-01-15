@@ -81,14 +81,16 @@ pub struct Item {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct User {
     pub id: String,
+    pub email: String, // This email is the email of the user in the auth service / github
     pub auth_id: String, // The id of the user in the Auth Service
     pub subscriptions: Vec<RepositorySubscription>,
 }
 
 impl User {
-    pub fn new(id: String, auth_id: String) -> Self {
+    pub fn new(id: String, auth_id: String, email: String) -> Self {
         Self {
             id,
+            email,
             auth_id,
             subscriptions: vec![],
         }
@@ -110,7 +112,8 @@ impl User {
             subscriptions: self
                 .subscriptions
                 .iter()
-                .filter(|s| &s.id != subscription_id).cloned()
+                .filter(|s| &s.id != subscription_id)
+                .cloned()
                 .collect(),
             ..self.clone()
         }
