@@ -49,6 +49,7 @@ impl ReviewStreamService {
                 user_repository: user_repository.clone(),
             },
             get_feed: GetFeed {
+                user_repository: user_repository.clone(),
                 push_repository: push_repository.clone(),
             },
             handle_github_push: HandleGithubPush {

@@ -23,10 +23,9 @@
 ## Personalization
 
 ### Subscribe to repos
-- Add page to subscribe to repos
-- Can unsubscribe from repos
-- Add a webhook handler for removing repo when the user loses access.
+
 - Only display items in feed from subscribed repositories
+- Add a webhook handler for removing repo when the user loses access.
 
 ### Collect info on relevance
 - What files does the user often touch

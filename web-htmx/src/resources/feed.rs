@@ -26,7 +26,16 @@ pub fn feed_routes(state: WebHtmxState) -> Router {
 }
 
 async fn get_feed(State(state): State<WebHtmxState>) -> impl IntoResponse {
-    let feed = state.review_feed_service.get_feed(GetFeedInput {}).await;
+    let ctx: crate::context::Context =
+        crate::context::context().expect("Unable to retrieve htmx context.");
+    let current_user = ctx.current_user.unwrap();
+
+    let feed = state
+        .review_feed_service
+        .get_feed(GetFeedInput {
+            auth_user_id: current_user.id.clone(),
+        })
+        .await;
 
     let feed = match feed {
         Ok(feed) => feed,
