@@ -43,7 +43,7 @@ impl ReviewStreamService {
                 user_repository: user_repository.clone(),
             },
             unsubscribe_from_repository: UnsubscribeFromRepository {
-              // Add any dependencies for the command here. They should be passed into this function and supplied by main.rs.
+                user_repository: user_repository.clone(),
             },
             subscribe_to_repository: SubscribeToRepository {
                 user_repository: user_repository.clone(),

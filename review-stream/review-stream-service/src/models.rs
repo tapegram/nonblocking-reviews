@@ -104,6 +104,18 @@ impl User {
             ..self.clone()
         }
     }
+
+    pub fn remove_subscription(&self, subscription_id: &String) -> User {
+        User {
+            subscriptions: self
+                .subscriptions
+                .iter()
+                .filter(|s| &s.id != subscription_id)
+                .map(|s| s.clone())
+                .collect(),
+            ..self.clone()
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
