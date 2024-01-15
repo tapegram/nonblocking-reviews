@@ -110,8 +110,7 @@ impl User {
             subscriptions: self
                 .subscriptions
                 .iter()
-                .filter(|s| &s.id != subscription_id)
-                .map(|s| s.clone())
+                .filter(|s| &s.id != subscription_id).cloned()
                 .collect(),
             ..self.clone()
         }

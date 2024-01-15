@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use serde::Deserialize;
 use thiserror::Error;
-use tracing::info;
+
 
 use crate::{models::RepositorySubscription, ports::user_repository::UserRepository};
 
