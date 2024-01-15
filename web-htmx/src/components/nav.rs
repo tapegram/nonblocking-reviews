@@ -9,7 +9,11 @@ use crate::routes;
 pub fn Nav() -> String {
     let ctx: crate::context::Context =
         crate::context::context().expect("Unable to retrieve htmx context.");
-    let nav_links: Vec<(&str, String)> = vec![("Home", routes::home()), ("Feed", routes::feed())];
+    let nav_links: Vec<(&str, String)> = vec![
+        ("Home", routes::home()),
+        ("Feed", routes::feed()),
+        ("Repositories", routes::repositories()),
+    ];
 
     html! {
         <nav class="border-b border-gray-200 bg-white">
