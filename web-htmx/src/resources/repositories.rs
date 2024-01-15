@@ -7,9 +7,9 @@ use crate::{
     state::WebHtmxState,
 };
 use axum::{
-    extract::State,
+    extract::{self, State},
     response::{Html, IntoResponse},
-    routing::get,
+    routing::{delete, get},
     Form, Router,
 };
 use axum_flash::Flash;
@@ -17,6 +17,7 @@ use futures::future::join_all;
 use http::StatusCode;
 use review_stream_service::{
     get_user::GetUserInput, subscribe_to_repository::SubscribeToRepositoryInput,
+    unsubscribe_from_repository::UnsubscribeFromRepositoryInput,
 };
 
 use rscx::{component, html, props};
@@ -35,6 +36,7 @@ pub fn repositories_routes(state: WebHtmxState) -> Router {
             routes::REPOSITORIES_CREATE_FORM,
             get(get_create_form).post(post_create_form),
         )
+        .route(routes::REPOSITORY, delete(delete_repository))
         .with_state(state)
 }
 
@@ -77,11 +79,8 @@ async fn get_repositories(State(state): State<WebHtmxState>) -> impl IntoRespons
                     <TableData variant=TDVariant::Last>
                         <TableDataActions>
                             <ActionLink
-                                hx_get=""//tag_edit_form(&props.worksite_id, &tag.id)
-                                hx_target=modal_target()
-                                hx_swap="beforeend"
-                                hx_push_url="" // routes::page_modal_from(tag_edit_form(&props.worksite_id, &tag.id))
-                                sr_text=&repo_subscription.name
+                                hx_delete=routes::repository(repo_subscription.id.clone())
+                                sr_text="Remove repository subscription"
                             >
                                 Remove
                             </ActionLink>
@@ -167,4 +166,34 @@ fn RepositorySubscriptionForm(props: RepositorySubscriptionFormProps) -> String 
         >
         </SimpleForm>
     }
+}
+
+async fn delete_repository(
+    extract::Path(subscription_id): extract::Path<String>,
+    State(WebHtmxState {
+        review_feed_service,
+        ..
+    }): State<WebHtmxState>,
+    flash: Flash,
+) -> impl IntoResponse {
+    let ctx: crate::context::Context =
+        crate::context::context().expect("Unable to retrieve htmx context.");
+    let current_user = ctx.current_user.unwrap();
+
+    review_feed_service
+        .unsubscribe_from_repository(UnsubscribeFromRepositoryInput {
+            subscription_id: subscription_id.clone(),
+            user_auth_id: current_user.id.clone(),
+        })
+        .await
+        .expect("Failed to remove subscription");
+
+    (
+        StatusCode::OK,
+        flash.success("Subscription removed!"),
+        [
+            ("hx-redirect", routes::repositories()),
+            ("hx-retarget", "body".into()),
+        ],
+    )
 }
