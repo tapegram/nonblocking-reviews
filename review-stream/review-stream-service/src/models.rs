@@ -84,6 +84,20 @@ pub struct User {
     pub email: String, // This email is the email of the user in the auth service / github
     pub auth_id: String, // The id of the user in the Auth Service
     pub subscriptions: Vec<RepositorySubscription>,
+    pub changes: Vec<RepositoryChanges>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RepositoryChanges {
+    pub repository_id: String,
+    pub push_id: String,
+    pub changes: Vec<FileChange>,
+    pub last_push: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FileChange {
+    pub path: String,
 }
 
 impl User {
@@ -93,6 +107,48 @@ impl User {
             email,
             auth_id,
             subscriptions: vec![],
+            changes: vec![],
+        }
+    }
+
+    pub fn record_push_file_changes(&self, push: &Push) -> User {
+        let collected_changes = push
+            .commits
+            .iter()
+            .map(|commit| {
+                let added = commit
+                    .added
+                    .iter()
+                    .map(|path| FileChange { path: path.clone() })
+                    .collect::<Vec<_>>();
+                let removed = commit
+                    .removed
+                    .iter()
+                    .map(|path| FileChange { path: path.clone() })
+                    .collect::<Vec<_>>();
+                let modified = commit
+                    .modified
+                    .iter()
+                    .map(|path| FileChange { path: path.clone() })
+                    .collect::<Vec<_>>();
+
+                let changes = [added.as_slice(), removed.as_slice(), modified.as_slice()].concat();
+
+                changes
+            })
+            .flatten()
+            .collect::<Vec<_>>();
+
+        let repository_changes = RepositoryChanges {
+            repository_id: push.repository.id.clone(),
+            push_id: push.id.clone(),
+            changes: collected_changes,
+            last_push: push.head_commit.timestamp.clone(),
+        };
+
+        User {
+            changes: [vec![repository_changes].as_slice(), self.changes.as_slice()].concat(),
+            ..self.clone()
         }
     }
 

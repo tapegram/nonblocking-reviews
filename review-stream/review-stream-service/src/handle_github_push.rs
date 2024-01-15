@@ -58,13 +58,26 @@ impl HandleGithubPush {
         );
 
         self.push_repository
-            .save(push)
+            .save(push.clone())
             .await
             .map_err(|e| HandleGithubPushFailure::Unknown(e.to_string()))?;
 
         // We also want to record all of the files that were changed in the last push
         // by the committer. This will allow us to do some simple personalization of the feed based
         // on file changes
+        let maybe_user = self
+            .user_repository
+            .get_by_email(input.github_event.pusher.user.email.clone())
+            .await
+            .map_err(|e| HandleGithubPushFailure::Unknown(e.to_string()))?;
+
+        if let Some(user) = maybe_user {
+            let user = user.record_push_file_changes(&push);
+            self.user_repository
+                .save(user)
+                .await
+                .map_err(|e| HandleGithubPushFailure::Unknown(e.to_string()))?;
+        }
 
         Ok(())
     }

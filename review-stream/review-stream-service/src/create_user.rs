@@ -38,6 +38,7 @@ impl CreateUser {
                 email: input.email,
                 auth_id: input.auth_id,
                 subscriptions: vec![],
+                changes: vec![],
             })
             .await
             .map_err(|e| CreateUserFailure::Unknown(e.to_string()))?;
