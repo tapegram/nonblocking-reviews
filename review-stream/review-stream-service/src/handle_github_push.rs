@@ -13,12 +13,13 @@ use tracing::info;
 
 use crate::{
     models::{Author, Commit, Committer, Push, Pusher, Repository},
-    ports::push_repository::PushRepository,
+    ports::{push_repository::PushRepository, user_repository::UserRepository},
 };
 
 #[derive(Clone)]
 pub struct HandleGithubPush {
     pub push_repository: Arc<dyn PushRepository>,
+    pub user_repository: Arc<dyn UserRepository>,
     pub openai_client: Arc<Client>,
 }
 

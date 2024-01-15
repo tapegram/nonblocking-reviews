@@ -53,6 +53,7 @@ impl ReviewStreamService {
                 push_repository: push_repository.clone(),
             },
             handle_github_push: HandleGithubPush {
+                user_repository: user_repository.clone(),
                 push_repository: push_repository.clone(),
                 openai_client,
             },
