@@ -1,5 +1,6 @@
 ## Cleanup
 
+- add utility functions for handling errors in view (like badRequest(message), internalError(message), etc)
 - wrap fetching summaries in an abstraction
 - failing to fetch a summary should not panic (use Result)
 
@@ -22,10 +23,10 @@
 ## Personalization
 
 ### Subscribe to repos
-- Add page for users to choose which repos (that they have access to) that they want to include in their feed.
+- Add page to subscribe to repos
+- Can unsubscribe from repos
 - Add a webhook handler for removing repo when the user loses access.
 - Only display items in feed from subscribed repositories
-- Can unsubscribe from repos
 
 ### Collect info on relevance
 - What files does the user often touch

@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
-use reqwest::header::{ACCEPT, AUTHORIZATION};
 use serde::Deserialize;
 use thiserror::Error;
+use tracing::info;
 
 use crate::{models::RepositorySubscription, ports::user_repository::UserRepository};
 
@@ -20,7 +20,7 @@ pub struct SubscribeToRepository {
 pub struct SubscribeToRepositoryInput {
     // Put input fields here
     pub repository_name: String, // Should be of the format {owner}/{repo}
-    pub user_id: String,
+    pub user_auth_id: String,
     pub user_github_access_token: String, // To fetch the repo
 }
 
@@ -34,14 +34,14 @@ impl SubscribeToRepository {
     ) -> SubscribeToRepositoryOutput {
         #[derive(Debug, Deserialize)]
         struct RepoInfo {
-            id: String,
+            id: i32,
             private: bool,
             full_name: String,
             permissions: Permissions,
         }
         #[derive(Debug, Deserialize)]
         struct Permissions {
-            pull: String,
+            pull: bool,
         }
 
         let repo_info = reqwest::Client::new()
@@ -50,12 +50,13 @@ impl SubscribeToRepository {
                 "https://api.github.com/repos/{}",
                 input.repository_name
             ))
-            .header(ACCEPT.as_str(), "application/vnd.github+json")
+            .header("Accept", "application/vnd.github+json")
             .header("X-GitHub-Api-Version", "2022-11-28")
             .header(
-                AUTHORIZATION.as_str(),
+                "Authorization",
                 format!("Bearer {}", &input.user_github_access_token),
             )
+            .header("User-Agent", "ReviewStream")
             .send()
             .await
             .map_err(|e| SubscribeToRepositoryFailure::Unknown(e.to_string()))?
@@ -65,13 +66,13 @@ impl SubscribeToRepository {
 
         let subscription = RepositorySubscription {
             id: uuid::Uuid::new_v4().to_string(),
-            external_id: repo_info.id,
+            external_id: repo_info.id.to_string(),
             name: repo_info.full_name,
         };
 
         let user = self
             .user_repository
-            .get_user(input.user_id.clone())
+            .get_by_auth_id(input.user_auth_id.clone())
             .await
             .map_err(|e| SubscribeToRepositoryFailure::Unknown(e.to_string()))?
             .ok_or(SubscribeToRepositoryFailure::NotFound)?;

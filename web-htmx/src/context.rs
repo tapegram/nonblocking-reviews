@@ -1,4 +1,4 @@
-use auth_service::models::{User};
+use auth_service::models::User;
 use axum::{
     body::Body,
     extract::{Query, State},
@@ -24,6 +24,7 @@ pub struct Context {
 pub struct LoggedInUser {
     pub id: String,
     pub email: String,
+    pub access_token: String,
 
     user: User,
 }
@@ -48,6 +49,7 @@ pub async fn provide_context_layer(
         Some(user) => Some(LoggedInUser {
             id: user.id.clone(),
             email: user.email.clone(),
+            access_token: user.access_token.clone(),
 
             user,
         }),

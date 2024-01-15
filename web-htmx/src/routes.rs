@@ -68,3 +68,16 @@ pub fn repository_edit_form(repository_id: String) -> String {
     format!("/repositories/{}/edit-form", repository_id)
 }
 
+pub fn page_modal_from(modal_resource_uri: String) -> String {
+    let ctx: crate::context::Context =
+        crate::context::context().expect("Unable to retrieve htmx context.");
+
+    let page_url = format!("{}/", &ctx.page_url);
+
+    if modal_resource_uri.starts_with(&page_url) {
+        let query = modal_resource_uri.replace(&page_url, "?modal=");
+        format!("{}{}", &ctx.page_url, query)
+    } else {
+        format!("{}?modal={}", &ctx.page_url, modal_resource_uri)
+    }
+}
