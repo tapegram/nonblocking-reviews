@@ -49,6 +49,18 @@ impl UserRepository for MongoFeedUserRepository {
         // Ok(maybe_worksite.map(|w| w.to_worksite()))
         todo!("")
     }
+
+    async fn get_by_email(&self, email: String) -> Result<Option<User>, RepositoryFailure> {
+        let filter = doc! { "email": email };
+        let maybe_user = self
+            .collection
+            .find_one(filter, None)
+            .await
+            .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
+
+        Ok(maybe_user.map(|u| user_record_to_user(&u)))
+    }
+
     async fn get_by_auth_id(&self, auth_id: String) -> Result<Option<User>, RepositoryFailure> {
         let filter = doc! { "auth_id": auth_id };
         let maybe_user = self
