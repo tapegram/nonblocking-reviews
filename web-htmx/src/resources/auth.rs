@@ -6,6 +6,7 @@ use axum::response::{IntoResponse, Redirect};
 use axum::{routing::get, Router};
 
 use axum_login::AuthSession;
+use http::header::USER_AGENT;
 use http::StatusCode;
 use mongo_user_repository::{Credentials, MongoUserStore};
 
@@ -23,7 +24,7 @@ pub fn auth_routes(state: WebHtmxState) -> Router {
 async fn get_login(State(state): State<WebHtmxState>) -> impl IntoResponse {
     Redirect::to(
         format!(
-            "https://github.com/login/oauth/authorize?scope=user:email&client_id={}",
+            "https://github.com/login/oauth/authorize?client_id={}",
             state.github_auth_config.client_id,
         )
         .as_str(),
@@ -34,6 +35,7 @@ async fn get_login(State(state): State<WebHtmxState>) -> impl IntoResponse {
 struct GithubAuthCallbackQueryParams {
     code: String,
 }
+
 async fn get_github_auth_callback(
     State(WebHtmxState {
         github_auth_config,
@@ -43,8 +45,6 @@ async fn get_github_auth_callback(
     mut auth: AuthSession<MongoUserStore>,
     Query(query_params): Query<GithubAuthCallbackQueryParams>,
 ) -> impl IntoResponse {
-    info!("Github auth callback");
-
     let client = reqwest::Client::new();
     let params = &[
         ("client_id", github_auth_config.client_id.clone()),
@@ -55,14 +55,14 @@ async fn get_github_auth_callback(
     let url =
         reqwest::Url::parse_with_params("https://github.com/login/oauth/access_token", params)
             .expect("Failed to parse params");
+
     let res = client
         .post(url)
         .header("Accept", "application/json")
+        .header(USER_AGENT.as_str(), "Code-Feed-App") // See: https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
         .send()
         .await
         .expect("Failed to validate with github");
-
-    info!("Got token from github");
 
     #[derive(Deserialize, Debug)]
     struct GithubAccessTokenResponse {

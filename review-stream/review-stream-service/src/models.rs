@@ -111,6 +111,13 @@ impl User {
         }
     }
 
+    pub fn set_email(&self, email: String) -> User {
+        User {
+            email,
+            ..self.clone()
+        }
+    }
+
     pub fn record_push_file_changes(&self, push: &Push) -> User {
         let collected_changes = push
             .commits

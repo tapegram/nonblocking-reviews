@@ -5,6 +5,7 @@ use futures::stream::TryStreamExt;
 use mongodb::bson::doc;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
+use tracing::info;
 
 use auth_service::models::{User, UserPermission, UserRole};
 use auth_service::ports::user_repository::{RepositoryFailure, UserRepository};
@@ -170,7 +171,7 @@ impl AuthnBackend for MongoUserStore {
         &self,
         Credentials { access_code }: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
-        // self.get_user(&user_id).await
+        info!("Authenticating");
         #[derive(Debug, Deserialize)]
         struct UserInfo {
             login: String,

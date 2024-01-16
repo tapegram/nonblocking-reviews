@@ -5,6 +5,7 @@ use review_stream_service::{
     models::User,
     ports::user_repository::{RepositoryFailure, UserRepository},
 };
+use tracing::{error, info};
 
 use crate::{
     mappers::{user_record_to_user, user_to_user_record},
@@ -63,11 +64,10 @@ impl UserRepository for MongoFeedUserRepository {
 
     async fn get_by_auth_id(&self, auth_id: String) -> Result<Option<User>, RepositoryFailure> {
         let filter = doc! { "auth_id": auth_id };
-        let maybe_user = self
-            .collection
-            .find_one(filter, None)
-            .await
-            .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
+        let maybe_user = self.collection.find_one(filter, None).await.map_err(|e| {
+            error!("Error fetching user: {:?}", e.to_string());
+            RepositoryFailure::Unknown(e.to_string())
+        })?;
 
         Ok(maybe_user.map(|u| user_record_to_user(&u)))
     }
@@ -81,7 +81,10 @@ impl UserRepository for MongoFeedUserRepository {
         self.collection
             .replace_one(filter, record, options)
             .await
-            .map_err(|e| RepositoryFailure::Unknown(e.to_string()))?;
+            .map_err(|e| {
+                error!("Error saving user: {:?}", e.to_string());
+                RepositoryFailure::Unknown(e.to_string())
+            })?;
         Ok(())
     }
 }

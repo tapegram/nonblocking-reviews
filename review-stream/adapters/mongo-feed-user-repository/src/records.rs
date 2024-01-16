@@ -4,9 +4,16 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct UserRecord {
     pub id: String,
+
+    #[serde(default)]
     pub email: String,
+
     pub auth_id: String,
+
+    #[serde(default)]
     pub subscriptions: Vec<RepositorySubscriptionRecord>,
+
+    #[serde(default)]
     pub changes: Vec<RepositoryChangesRecord>,
 }
 

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use thiserror::Error;
+use tracing::info;
 
 use crate::{models::User, ports::user_repository::UserRepository};
 
@@ -27,19 +28,19 @@ impl CreateUser {
             .await
             .map_err(|e| CreateUserFailure::Unknown(e.to_string()))?;
 
-        // If the user already exists, do nothing and return early
-        if maybe_existing_user.is_some() {
-            return Ok(());
-        }
+        // Unwrap or create a new user
+        let user = maybe_existing_user.unwrap_or_else(|| User {
+            id: uuid::Uuid::new_v4().to_string(),
+            email: input.email.clone(),
+            auth_id: input.auth_id.clone(),
+            subscriptions: vec![],
+            changes: vec![],
+        });
+        // Make sure we always update the email (old data may not have an email address).
+        let user = user.set_email(input.email.clone());
 
         self.user_repository
-            .save(User {
-                id: uuid::Uuid::new_v4().to_string(),
-                email: input.email,
-                auth_id: input.auth_id,
-                subscriptions: vec![],
-                changes: vec![],
-            })
+            .save(user)
             .await
             .map_err(|e| CreateUserFailure::Unknown(e.to_string()))?;
 

@@ -7,6 +7,7 @@
 
 ## Cleanup
 
+- Don't panic in oauth flow since it causes github to resend the callback (which explodes)
 - add utility functions for handling errors in view (like badRequest(message), internalError(message), etc)
 - wrap fetching summaries in an abstraction
 - failing to fetch a summary should not panic (use Result)
