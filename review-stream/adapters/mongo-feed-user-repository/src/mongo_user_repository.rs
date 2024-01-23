@@ -5,7 +5,7 @@ use review_stream_service::{
     models::User,
     ports::user_repository::{RepositoryFailure, UserRepository},
 };
-use tracing::{error, info};
+use tracing::error;
 
 use crate::{
     mappers::{user_record_to_user, user_to_user_record},

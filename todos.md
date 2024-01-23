@@ -1,7 +1,5 @@
 # Next
 
-- Start collecting info on commits (files updated)
-- Store in the user record
 - Add vector DB for searching based on a push
 - Store personalized feed values?
 

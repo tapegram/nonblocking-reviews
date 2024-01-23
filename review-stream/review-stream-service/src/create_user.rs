@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use thiserror::Error;
-use tracing::info;
 
 use crate::{models::User, ports::user_repository::UserRepository};
 
